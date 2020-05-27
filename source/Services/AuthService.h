@@ -12,7 +12,8 @@ bool signIn(char *login, char *password);
 bool signUp(char *login, char *password);
 
 char* makeData(char *log, char *pas);
-int stringFind(FILE *database, char *str, long file_size);
+bool stringFind(FILE *database, char *login, long file_size, char *password);
+
 
 #define SERVER_AUTHSERVICE_H
 

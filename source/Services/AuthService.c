@@ -10,8 +10,12 @@
 
 #define STR_LEN_MAX 100
 
-bool signIn(char *login, char *password) {
-bool signIn(char* login, char * password){
+/** TODO
+ * обработка разных ошибок входа
+ * обработка разных ошибок регистрации
+ */
+ 
+bool signIn(char* login, char * password) {
     //open file
     FILE* database = fopen("../data/users.txt", "rt");
     if (!database)
@@ -22,26 +26,14 @@ bool signIn(char* login, char * password){
     fseek(database, 0, SEEK_END);
     long file_size = ftell(database);
 
+    //check database
     if (!stringFind(database, login, file_size, password))
     {
-        printf("\nERROR: the login are already used");
+        printf("\nERROR: the login are not exist");
         return false;
     }
-    //open file
-    FILE* database = fopen("../data/users.txt", "rt");
-    if (!database)
-    {
-        puts("Error open database");
-        return -2;
-    }
-    fseek(database, 0, SEEK_END);
-    long file_size = ftell(database);
 
-    if (!stringFind(database, login, file_size))
-    {
-        printf("\nERROR: the login are already used");
-        return false;
-    }
+    return true;
 }
 
 char *makeData(char *login, char *password) {
@@ -55,46 +47,61 @@ char *makeData(char *login, char *password) {
     return temp;
 }
 
-int stringFind(FILE *database, char *string, long file_size) {
-int stringFind(FILE *database, char *str, long file_size) {
+bool stringFind(FILE *database, char *login, long file_size, char *password) {
     //go to the begin of file
     fseek(database, 0, SEEK_SET);
 
     //buffer for checking
-    char *string = (char *) calloc(STR_LEN_MAX, sizeof(char));
+    char* string = (char*)calloc(STR_LEN_MAX, sizeof(char));
     if (!string) exit(EXIT_FAILURE);
-    char *stringbuf = (char *) calloc(STR_LEN_MAX, sizeof(char));
+    char* stringbuf = (char*)calloc(STR_LEN_MAX, sizeof(char));
     if (!stringbuf) exit(EXIT_FAILURE);
+    char* stringbuf2 = (char*)calloc(STR_LEN_MAX, sizeof(char));
+    if (!stringbuf2) exit(EXIT_FAILURE);
+    char* stringbuf3 = (char*)calloc(STR_LEN_MAX, sizeof(char));
+    if (!stringbuf3) exit(EXIT_FAILURE);
+
+    if (password == NULL)
+        stringbuf2 = NULL;
 
     //skip the strings while it is not a neccessary key
-    while (strcmp(stringbuf, string)) {
+    while (strcmp(stringbuf, login) && strcmp(stringbuf2, password)){
         //read a string from file
         fgets(string, STR_LEN_MAX, database);
-        stringbuf = strtok(string, ":");
+        stringbuf = strtok (string, ":");
+
+       if (password != NULL) {
+           stringbuf3 = stringbuf;
+           stringbuf = strtok(NULL, ":");
+       }
+
+       stringbuf2 = stringbuf;
+       stringbuf = stringbuf3;
+       printf("%s - %s \n", stringbuf, stringbuf2);
 
         //if the end of file
-        if (ftell(database) == file_size) {
+        if (ftell(database) == file_size)
+        {
             free(string);
-            return 0;
+            return false;
         }
     }
 
-    free(string);
-    return 1;
+    return true;
 }
 
 bool signUp(char *login, char *password) {
     //open file
     FILE *database = fopen("../data/users.txt", "rt");
     if (!database) {
-        printf("[%s] Error open database\n", getCurrentTime());
-        return -2;
+      //  printf("[%s] Error open database\n", getCurrentTime());
+        return false;
     }
     fseek(database, 0, SEEK_END);
     long file_size = ftell(database);
 
     //check database
-    if (stringFind(database, login, file_size)) {
+    if (stringFind(database, login, file_size, NULL)) {
         printf("[%s] ERROR: the login are already used\n", getCurrentTime());
         return false;
     }
@@ -104,15 +111,16 @@ bool signUp(char *login, char *password) {
     database = fopen("../data/users.txt", "a");
     if (!database) {
         printf("[%s] Error open database\n", getCurrentTime());
-        return -2;
+        return false;
     }
     fprintf(database, "%s", data);
 
     return true;
 }
 
-/* TEST function
+ /*//TEST function
 int main(){
-    signUp("nat", "1002");
+    signIn("nat", "1002");
+   return 0;
 
 }*/
