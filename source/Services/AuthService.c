@@ -14,22 +14,20 @@
  * обработка разных ошибок входа
  * обработка разных ошибок регистрации
  */
- 
-bool signIn(char* login, char * password) {
+
+bool signIn(char *login, char *password) {
     //open file
-    FILE* database = fopen("../data/users.txt", "rt");
-    if (!database)
-    {
-        puts("Error open database");
+    FILE *database = fopen("../data/users.txt", "rt");
+    if (!database) {
+        printf("[%s] Error open database\n", getCurrentTime());
         return -2;
     }
     fseek(database, 0, SEEK_END);
     long file_size = ftell(database);
 
     //check database
-    if (!stringFind(database, login, file_size, password))
-    {
-        printf("\nERROR: the login are not exist");
+    if (!stringFind(database, login, file_size, password)) {
+        printf("[%s] ERROR: the login are not exist\n", getCurrentTime());
         return false;
     }
 
@@ -52,36 +50,35 @@ bool stringFind(FILE *database, char *login, long file_size, char *password) {
     fseek(database, 0, SEEK_SET);
 
     //buffer for checking
-    char* string = (char*)calloc(STR_LEN_MAX, sizeof(char));
+    char *string = (char *) calloc(STR_LEN_MAX, sizeof(char));
     if (!string) exit(EXIT_FAILURE);
-    char* stringbuf = (char*)calloc(STR_LEN_MAX, sizeof(char));
+    char *stringbuf = (char *) calloc(STR_LEN_MAX, sizeof(char));
     if (!stringbuf) exit(EXIT_FAILURE);
-    char* stringbuf2 = (char*)calloc(STR_LEN_MAX, sizeof(char));
+    char *stringbuf2 = (char *) calloc(STR_LEN_MAX, sizeof(char));
     if (!stringbuf2) exit(EXIT_FAILURE);
-    char* stringbuf3 = (char*)calloc(STR_LEN_MAX, sizeof(char));
+    char *stringbuf3 = (char *) calloc(STR_LEN_MAX, sizeof(char));
     if (!stringbuf3) exit(EXIT_FAILURE);
 
     if (password == NULL)
         stringbuf2 = NULL;
 
     //skip the strings while it is not a neccessary key
-    while (strcmp(stringbuf, login) && strcmp(stringbuf2, password)){
+    while (strcmp(stringbuf, login) && strcmp(stringbuf2, password)) {
         //read a string from file
         fgets(string, STR_LEN_MAX, database);
-        stringbuf = strtok (string, ":");
+        stringbuf = strtok(string, ":");
 
-       if (password != NULL) {
-           stringbuf3 = stringbuf;
-           stringbuf = strtok(NULL, ":");
-       }
+        if (password != NULL) {
+            stringbuf3 = stringbuf;
+            stringbuf = strtok(NULL, ":");
+        }
 
-       stringbuf2 = stringbuf;
-       stringbuf = stringbuf3;
-       printf("%s - %s \n", stringbuf, stringbuf2);
+        stringbuf2 = stringbuf;
+        stringbuf = stringbuf3;
+        printf("%s - %s \n", stringbuf, stringbuf2);
 
         //if the end of file
-        if (ftell(database) == file_size)
-        {
+        if (ftell(database) == file_size) {
             free(string);
             return false;
         }
@@ -94,7 +91,7 @@ bool signUp(char *login, char *password) {
     //open file
     FILE *database = fopen("../data/users.txt", "rt");
     if (!database) {
-      //  printf("[%s] Error open database\n", getCurrentTime());
+        printf("[%s] Error open database\n", getCurrentTime());
         return false;
     }
     fseek(database, 0, SEEK_END);
@@ -118,9 +115,9 @@ bool signUp(char *login, char *password) {
     return true;
 }
 
- /*//TEST function
+/*//TEST function
 int main(){
-    signIn("nat", "1002");
-   return 0;
+   signIn("nat", "1002");
+  return 0;
 
 }*/

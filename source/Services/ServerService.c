@@ -11,6 +11,7 @@ pthread_mutex_t mutex;
 
 void *clientHandler(void *param) {
     SOCKET clientSocket = (SOCKET) param;
+
     char recieve[1024], transmit[1024];
     int ret;
     ret = recv(clientSocket, recieve, 1024, 0);
@@ -20,18 +21,22 @@ void *clientHandler(void *param) {
         pthread_mutex_unlock(&mutex);
         return (void *) 1;
     }
+
     recieve[ret] = '\0';
     pthread_mutex_lock(&mutex);
     printf("%s\n", recieve);
     pthread_mutex_unlock(&mutex);
     printf(transmit, "[%s] %s %s %s\n", getCurrentTime(), "Your data", recieve, " was received");
+
     ret = send(clientSocket, transmit, sizeof(transmit), 0);
+
     if (ret == SOCKET_ERROR) {
         pthread_mutex_lock(&mutex);
         printf("[%s] Error sending data\n", getCurrentTime());
         pthread_mutex_unlock(&mutex);
         return (void *) 2;
     }
+
     return (void *) 0;
 }
 
