@@ -1,5 +1,5 @@
 # system
-cmake_minimum_required(VERSION 3.16)
+#cmake_minimum_required(VERSION 3.16)
 set(CMAKE_C_STANDARD 11)
 
 # project
@@ -11,5 +11,7 @@ set(source_files
         )
 
 # build
-add_executable(server source/Init.c source/ServerService.c source/ServerService.h source/TimeService.c source/TimeService.h source/AuthService.c source/AuthService.h)
+#add_executable(server source/Init.c source/ServerService.c source/ServerService.h source/TimeService.c source/TimeService.h source/AuthService.c source/AuthService.h)
+add_executable(server source/AuthService.c source/AuthService.h)
+
 target_link_libraries(server ws2_32)
