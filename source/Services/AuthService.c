@@ -3,11 +3,14 @@
  */
 
 #include "AuthService.h"
+#include "TimeService.h"
 #include "stdlib.h"
 #include "string.h"
 #include <stdio.h>
+
 #define STR_LEN_MAX 100
 
+bool signIn(char *login, char *password) {
 bool signIn(char* login, char * password){
     //open file
     FILE* database = fopen("../data/users.txt", "rt");
@@ -24,21 +27,35 @@ bool signIn(char* login, char * password){
         printf("\nERROR: the login are already used");
         return false;
     }
+    //open file
+    FILE* database = fopen("../data/users.txt", "rt");
+    if (!database)
+    {
+        puts("Error open database");
+        return -2;
+    }
+    fseek(database, 0, SEEK_END);
+    long file_size = ftell(database);
 
-    return false;
+    if (!stringFind(database, login, file_size))
+    {
+        printf("\nERROR: the login are already used");
+        return false;
+    }
 }
 
-char* makeData(char *log, char *pas){
-    int size = strlen(log) + strlen(pas) + 2;
-    char * temp = (char*)malloc(size);
-    strcat(temp, log);
+char *makeData(char *login, char *password) {
+    int size = strlen(login) + strlen(password) + 2;
+    char *temp = (char *) malloc(size);
+    strcat(temp, login);
     strcat(temp, ":");
-    strcat(temp, pas);
+    strcat(temp, password);
     strcat(temp, "\n");
 
     return temp;
 }
 
+int stringFind(FILE *database, char *string, long file_size) {
 int stringFind(FILE *database, char *str, long file_size) {
     //go to the begin of file
     fseek(database, 0, SEEK_SET);
@@ -66,8 +83,36 @@ int stringFind(FILE *database, char *str, long file_size) {
     return 1;
 }
 
-// TEST function
-int main(){
-    signIn("nat", "1002");
+bool signUp(char *login, char *password) {
+    //open file
+    FILE *database = fopen("../data/users.txt", "rt");
+    if (!database) {
+        printf("[%s] Error open database\n", getCurrentTime());
+        return -2;
+    }
+    fseek(database, 0, SEEK_END);
+    long file_size = ftell(database);
+
+    //check database
+    if (stringFind(database, login, file_size)) {
+        printf("[%s] ERROR: the login are already used\n", getCurrentTime());
+        return false;
+    }
+
+    //add to database
+    char *data = makeData(login, password);
+    database = fopen("../data/users.txt", "a");
+    if (!database) {
+        printf("[%s] Error open database\n", getCurrentTime());
+        return -2;
+    }
+    fprintf(database, "%s", data);
+
+    return true;
 }
 
+/* TEST function
+int main(){
+    signUp("nat", "1002");
+
+}*/
