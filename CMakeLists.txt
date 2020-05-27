@@ -7,9 +7,9 @@ project(server C)
 
 # sources
 set(source_files
-        main.c
+        source/main.c
         )
 
 # build
-add_executable(server main.c)
+add_executable(server source/main.c)
 target_link_libraries(server ws2_32)
