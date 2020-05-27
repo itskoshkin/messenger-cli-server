@@ -12,4 +12,4 @@ bool signUp(char* login, char * password);
 
 #define SERVER_AUTHSERVICE_H
 
-#endif //SERVER_AUTHSERVICE_H
+#endif
