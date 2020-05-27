@@ -7,9 +7,9 @@ project(server C)
 
 # sources
 set(source_files
-        source/main.c
+        source/Init.c
         )
 
 # build
-add_executable(server source/main.c)
+add_executable(server source/Init.c source/ServerService.c source/ServerService.h source/TimeService.c source/TimeService.h)
 target_link_libraries(server ws2_32)

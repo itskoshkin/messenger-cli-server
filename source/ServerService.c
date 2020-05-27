@@ -1,6 +1,9 @@
-#include <pthread.h>
-#include <winsock2.h>
-#include <stdio.h>
+//
+// Created by Stanislav on 27.05.2020.
+//
+
+#include "ServerService.h"
+#include "TimeService.h"
 
 #define PORT 8080
 
@@ -13,7 +16,7 @@ void *clientHandler(void *param) {
     ret = recv(clientSocket, recieve, 1024, 0);
     if (!ret || ret == SOCKET_ERROR) {
         pthread_mutex_lock(&mutex);
-        printf("Error getting data\n");
+        printf("[%s] Error getting data\n", getCurrentTime());
         pthread_mutex_unlock(&mutex);
         return (void *) 1;
     }
@@ -21,11 +24,11 @@ void *clientHandler(void *param) {
     pthread_mutex_lock(&mutex);
     printf("%s\n", recieve);
     pthread_mutex_unlock(&mutex);
-    printf_s(transmit, "%s %s %s\n", "Your data", recieve, "received");
+    printf(transmit, "[%s] %s %s %s\n", getCurrentTime(), "Your data", recieve, "received");
     ret = send(clientSocket, transmit, sizeof(transmit), 0);
     if (ret == SOCKET_ERROR) {
         pthread_mutex_lock(&mutex);
-        printf("Error sending data\n");
+        printf("[%s] Error sending data\n", getCurrentTime());
         pthread_mutex_unlock(&mutex);
         return (void *) 2;
     }
@@ -41,7 +44,7 @@ void clientAcceptor(SOCKET server) {
         size = sizeof(clientaddr);
         client = accept(server, (struct sockaddr *) &clientaddr, &size);
         if (client == INVALID_SOCKET) {
-            printf("Error accept client\n");
+            printf("[%s] Error accept client\n", getCurrentTime());
             continue;
         }
         pthread_t mythread;
@@ -50,10 +53,10 @@ void clientAcceptor(SOCKET server) {
         /*
          * crutch to avoid endless warnings
          */
-        if(status == 3) break;
+        if (status == 3) break;
     }
     pthread_mutex_destroy(&mutex);
-    printf("Server is stopped\n");
+    printf("[%s] Server is stopped\n", getCurrentTime());
     closesocket(server);
 }
 
@@ -63,37 +66,20 @@ int initServer() {
 
     server = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
     if (server == INVALID_SOCKET) {
-        printf("Error create server\n");
+        printf("[%s] Error create server\n", getCurrentTime());
         return 1;
     }
     localaddr.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
     localaddr.sin_family = AF_INET;
     localaddr.sin_port = htons(PORT);//port number is for example, must be more than 1024
     if (bind(server, (struct sockaddr *) &localaddr, sizeof(localaddr)) == SOCKET_ERROR) {
-        printf("Can't start server\n");
+        printf("[%s] Can't start server\n", getCurrentTime());
         return 2;
     } else {
-        printf("Server is started\n");
+        printf("[%s] Server is started\n", getCurrentTime());
     }
     listen(server, 50);//50 клиентов в очереди могут стоять
     pthread_mutex_init(&mutex, NULL);
     clientAcceptor(server);
     return 0;
 }
-
-int main() {
-    WSADATA wsd;
-    if (WSAStartup(MAKEWORD(1, 1), &wsd) == 0) {
-        printf("Connected to socket lib\n");
-    } else {
-        return 1;
-    }
-    int err = 0;
-    if (err = initServer()) {
-        return err;
-    }
-
-    return 0;
-
-}
-
