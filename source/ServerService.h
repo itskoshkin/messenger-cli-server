@@ -11,6 +11,10 @@
 #include <winsock2.h>
 #include <stdio.h>
 
+/**
+ * @authors Stanislav Stoianov, Daria Pavlova
+ */
+
 void *clientHandler(void *param);
 
 void clientAcceptor(SOCKET server);
