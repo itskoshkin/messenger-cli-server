@@ -24,7 +24,7 @@ void *clientHandler(void *param) {
     pthread_mutex_lock(&mutex);
     printf("%s\n", recieve);
     pthread_mutex_unlock(&mutex);
-    printf(transmit, "[%s] %s %s %s\n", getCurrentTime(), "Your data", recieve, "received");
+    printf(transmit, "[%s] %s %s %s\n", getCurrentTime(), "Your data", recieve, " was received");
     ret = send(clientSocket, transmit, sizeof(transmit), 0);
     if (ret == SOCKET_ERROR) {
         pthread_mutex_lock(&mutex);
@@ -40,9 +40,10 @@ void clientAcceptor(SOCKET server) {
     struct sockaddr_in clientaddr;
     SOCKET client;
     while (1) {
-
         size = sizeof(clientaddr);
         client = accept(server, (struct sockaddr *) &clientaddr, &size);
+        printf("[%s] Client %llu was accepted\n", getCurrentTime(), client);
+
         if (client == INVALID_SOCKET) {
             printf("[%s] Error accept client\n", getCurrentTime());
             continue;
