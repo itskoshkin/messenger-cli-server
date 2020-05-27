@@ -31,15 +31,15 @@ int stringFind(FILE *database, char *string, long file_size) {
     fseek(database, 0, SEEK_SET);
 
     //buffer for checking
-    char *string = (char *) calloc(STR_LEN_MAX, sizeof(char));
-    if (!string) exit(EXIT_FAILURE);
+    char *substring = (char *) calloc(STR_LEN_MAX, sizeof(char));
+    if (!substring) exit(EXIT_FAILURE);
     char *stringbuf = (char *) calloc(STR_LEN_MAX, sizeof(char));
     if (!stringbuf) exit(EXIT_FAILURE);
 
     //skip the strings while it is not a neccessary key
     while (strcmp(stringbuf, string)) {
         //read a string from file
-        fgets(string, STR_LEN_MAX, database);
+        fgets(substring, STR_LEN_MAX, database);
         stringbuf = strtok(string, ":");
 
         //if the end of file
