@@ -2,8 +2,8 @@
  * @authors Stanislav Stoianov, Daria Pavlova
  */
 
-#include "../Services/ServerService.h"
-#include "../Services/TimeService.h"
+#include "Services/ServerService.h"
+#include "Services/TimeService.h"
 
 int main() {
     WSADATA wsd;
