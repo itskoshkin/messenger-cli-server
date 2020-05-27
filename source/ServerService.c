@@ -1,6 +1,6 @@
-//
-// Created by Stanislav on 27.05.2020.
-//
+/**
+ * @authors Stanislav Stoianov, Daria Pavlova
+ */
 
 #include "ServerService.h"
 #include "TimeService.h"
