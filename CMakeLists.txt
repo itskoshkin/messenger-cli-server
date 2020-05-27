@@ -11,5 +11,5 @@ set(source_files
         )
 
 # build
-add_executable(server source/Init.c source/ServerService.c source/ServerService.h source/TimeService.c source/TimeService.h source/AuthService.c source/AuthService.h)
+add_executable(server source/Init.c source/Services/ServerService.c source/Services/ServerService.h source/Services/TimeService.c source/Services/TimeService.h source/Services/AuthService.c source/Services/AuthService.h)
 target_link_libraries(server ws2_32)
