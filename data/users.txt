@@ -1,3 +1,2 @@
-[username]: [password]
-kate: 12345
-sema: 12345
+[username]:[password]
+nat:1002
