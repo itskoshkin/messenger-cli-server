@@ -1,3 +1,7 @@
+/**
+ * @authors Stanislav Stoianov, Daria Pavlova
+ */
+
 #include "ServerService.h"
 #include "TimeService.h"
 
