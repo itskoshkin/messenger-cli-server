@@ -14,7 +14,7 @@
  * обработка разных ошибок входа
  * обработка разных ошибок регистрации
  */
- 
+
 bool signIn(char* login, char * password) {
     //open file
     FILE* database = fopen("../data/users.txt", "rt");
