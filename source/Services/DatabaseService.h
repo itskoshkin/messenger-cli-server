@@ -7,7 +7,9 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-bool processingUser(bool isRegistration, char *login, char *password);
+bool signIn(char *login, char *password);
+
+bool signUp(char *login, char *password);
 
 #define SERVER_AUTHSERVICE_H
 
