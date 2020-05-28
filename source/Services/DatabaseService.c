@@ -3,28 +3,21 @@
  */
 
 #include "DatabaseService.h"
-//#include "TimeService.h"
+#include "TimeService.h"
 #include "stdlib.h"
 #include "string.h"
 #include <stdio.h>
 
 #define STR_LEN_MAX 100
 
-/** TODO
- * обработка разных ошибок входа
- * обработка разных ошибок регистрации
- */
-
 bool stringFind(FILE *database, char *login, long file_size);
 bool checkPassword(char *password, FILE *database);
+bool openData(FILE *database);
 
 bool signIn(char *login, char *password) {
     //open file
     FILE *database = fopen("../data/users.txt", "rt");
-    if (!database) {
-        printf("[%s] Error open database\n", getCurrentTime());
-        return -2;
-    }
+    openData(database);
     fseek(database, 0, SEEK_END);
     long file_size = ftell(database);
 
@@ -63,7 +56,7 @@ bool checkPassword(char *password, FILE *database){
     char *stringbuf = (char *) calloc(STR_LEN_MAX, sizeof(char));
     if (!stringbuf) exit(EXIT_FAILURE);
 
-    //get password
+    //getting password
     fgets(string, STR_LEN_MAX, database);
     stringbuf = strtok(string, ":");
     stringbuf = strtok(NULL, ":");
@@ -74,6 +67,13 @@ bool checkPassword(char *password, FILE *database){
     else
         return false;
 
+}
+
+bool openData(FILE *database) {
+    if (!database) {
+        printf("[%s] ERROR: Error open database\n", getCurrentTime());
+        return false;
+    }
 }
 
 bool stringFind(FILE *database, char *login, long file_size) {
@@ -107,10 +107,8 @@ bool stringFind(FILE *database, char *login, long file_size) {
 bool signUp(char *login, char *password) {
     //open file
     FILE *database = fopen("../data/users.txt", "rt");
-    if (!database) {
-        printf("[%s] ERROR: Error open database\n", getCurrentTime());
-        return false;
-    }
+    openData(database);
+
     fseek(database, 0, SEEK_END);
     long file_size = ftell(database);
 
@@ -123,12 +121,9 @@ bool signUp(char *login, char *password) {
     //add to database
     char *data = makeData(login, password);
     database = fopen("../data/users.txt", "a");
-    if (!database) {
-        printf("[%s] ERROR: Error open database\n", getCurrentTime());
-        return false;
-    }
-    fprintf(database, "%s", data);
+    openData(database);
 
+    fprintf(database, "%s", data);
     return true;
 }
 
