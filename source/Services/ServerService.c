@@ -9,15 +9,26 @@
 
 pthread_mutex_t mutex;
 
+void *clientMessageHandler(SOCKET clientSocket) {
+
+}
+
 void *clientHandler(void *param) {
     SOCKET clientSocket = (SOCKET) param;
 
-    char recieve[1024], transmit[1024];
+
+    char recieve[1024];
+    char transmit[1024];
     int ret;
     ret = recv(clientSocket, recieve, 1024, 0);
+
+    do {
+        //todo something
+    } while (recieve > 0);
+
     if (!ret || ret == SOCKET_ERROR) {
         pthread_mutex_lock(&mutex);
-        printf("[%s] Error getting data\n", getCurrentTime());
+        printf("[%s] ERROR: Error getting data\n", getCurrentTime());
         pthread_mutex_unlock(&mutex);
         return (void *) 1;
     }
@@ -25,14 +36,17 @@ void *clientHandler(void *param) {
     recieve[ret] = '\0';
     pthread_mutex_lock(&mutex);
     printf("%s\n", recieve);
+
+
     pthread_mutex_unlock(&mutex);
+
     printf(transmit, "[%s] %s %s %s\n", getCurrentTime(), "Your data", recieve, " was received");
 
     ret = send(clientSocket, transmit, sizeof(transmit), 0);
 
     if (ret == SOCKET_ERROR) {
         pthread_mutex_lock(&mutex);
-        printf("[%s] Error sending data\n", getCurrentTime());
+        printf("[%s] ERROR: Error sending data\n", getCurrentTime());
         pthread_mutex_unlock(&mutex);
         return (void *) 2;
     }
@@ -47,10 +61,10 @@ void clientAcceptor(SOCKET server) {
     while (1) {
         size = sizeof(clientaddr);
         client = accept(server, (struct sockaddr *) &clientaddr, &size);
-        printf("[%s] Client %llu was accepted\n", getCurrentTime(), client);
+        printf("[%s] INFO: Client %llu was accepted\n", getCurrentTime(), client);
 
         if (client == INVALID_SOCKET) {
-            printf("[%s] Error accept client\n", getCurrentTime());
+            printf("[%s] WARN: Error accept client\n", getCurrentTime());
             continue;
         }
         pthread_t mythread;
@@ -62,7 +76,7 @@ void clientAcceptor(SOCKET server) {
         if (status == 3) break;
     }
     pthread_mutex_destroy(&mutex);
-    printf("[%s] Server is stopped\n", getCurrentTime());
+    printf("[%s] INFO: Server is stopped\n", getCurrentTime());
     closesocket(server);
 }
 
@@ -72,17 +86,17 @@ int initServer() {
 
     server = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
     if (server == INVALID_SOCKET) {
-        printf("[%s] Error create server\n", getCurrentTime());
+        printf("[%s] ERROR: Error create server\n", getCurrentTime());
         return 1;
     }
     localaddr.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
     localaddr.sin_family = AF_INET;
     localaddr.sin_port = htons(PORT);//port number is for example, must be more than 1024
     if (bind(server, (struct sockaddr *) &localaddr, sizeof(localaddr)) == SOCKET_ERROR) {
-        printf("[%s] Can't start server\n", getCurrentTime());
+        printf("[%s] ERROR: Cannot start server\n", getCurrentTime());
         return 2;
     } else {
-        printf("[%s] Server is started\n", getCurrentTime());
+        printf("[%s] INFO: Server started\n", getCurrentTime());
     }
     listen(server, 50);//50 клиентов в очереди могут стоять
     pthread_mutex_init(&mutex, NULL);
