@@ -1,4 +1,5 @@
 [username]:[password]
 nat:1002
-nat:1002
-nat:1002
+natis:1002
+natis:10002
+
