@@ -91,7 +91,7 @@ bool signUp(char *login, char *password) {
     //open file
     FILE *database = fopen("../data/users.txt", "rt");
     if (!database) {
-        printf("[%s] Error open database\n", getCurrentTime());
+        printf("[%s] ERROR: Error open database\n", getCurrentTime());
         return false;
     }
     fseek(database, 0, SEEK_END);
@@ -107,7 +107,7 @@ bool signUp(char *login, char *password) {
     char *data = makeData(login, password);
     database = fopen("../data/users.txt", "a");
     if (!database) {
-        printf("[%s] Error open database\n", getCurrentTime());
+        printf("[%s] ERROR: Error open database\n", getCurrentTime());
         return false;
     }
     fprintf(database, "%s", data);
