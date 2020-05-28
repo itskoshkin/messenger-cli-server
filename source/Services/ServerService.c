@@ -9,15 +9,26 @@
 
 pthread_mutex_t mutex;
 
+void *clientMessageHandler(SOCKET clientSocket) {
+
+}
+
 void *clientHandler(void *param) {
     SOCKET clientSocket = (SOCKET) param;
 
-    char recieve[1024], transmit[1024];
+
+    char recieve[1024];
+    char transmit[1024];
     int ret;
     ret = recv(clientSocket, recieve, 1024, 0);
+
+    do {
+        //todo something
+    } while (recieve > 0);
+
     if (!ret || ret == SOCKET_ERROR) {
         pthread_mutex_lock(&mutex);
-        printf("[%s] Error getting data\n", getCurrentTime());
+        printf("[%s] ERROR: Error getting data\n", getCurrentTime());
         pthread_mutex_unlock(&mutex);
         return (void *) 1;
     }
@@ -25,14 +36,17 @@ void *clientHandler(void *param) {
     recieve[ret] = '\0';
     pthread_mutex_lock(&mutex);
     printf("%s\n", recieve);
+
+
     pthread_mutex_unlock(&mutex);
+
     printf(transmit, "[%s] %s %s %s\n", getCurrentTime(), "Your data", recieve, " was received");
 
     ret = send(clientSocket, transmit, sizeof(transmit), 0);
 
     if (ret == SOCKET_ERROR) {
         pthread_mutex_lock(&mutex);
-        printf("[%s] Error sending data\n", getCurrentTime());
+        printf("[%s] ERROR: Error sending data\n", getCurrentTime());
         pthread_mutex_unlock(&mutex);
         return (void *) 2;
     }
@@ -79,10 +93,10 @@ int initServer() {
     localaddr.sin_family = AF_INET;
     localaddr.sin_port = htons(PORT);//port number is for example, must be more than 1024
     if (bind(server, (struct sockaddr *) &localaddr, sizeof(localaddr)) == SOCKET_ERROR) {
-        printf("[%s] ERROR: Can't start server\n", getCurrentTime());
+        printf("[%s] ERROR: Cannot start server\n", getCurrentTime());
         return 2;
     } else {
-        printf("[%s] INFO: Server is started\n", getCurrentTime());
+        printf("[%s] INFO: Server started\n", getCurrentTime());
     }
     listen(server, 50);//50 клиентов в очереди могут стоять
     pthread_mutex_init(&mutex, NULL);
