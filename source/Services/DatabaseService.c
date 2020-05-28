@@ -16,12 +16,13 @@
  */
 
 bool stringFind(FILE *database, char *login, long file_size);
+bool checkPassword(char *password, FILE *database);
 
 bool signIn(char *login, char *password) {
     //open file
     FILE *database = fopen("../data/users.txt", "rt");
     if (!database) {
-      //  printf("[%s] Error open database\n", getCurrentTime());
+        printf("[%s] Error open database\n", getCurrentTime());
         return -2;
     }
     fseek(database, 0, SEEK_END);
@@ -29,12 +30,18 @@ bool signIn(char *login, char *password) {
 
     //check database
     if (!stringFind(database, login, file_size)) {
-       // printf("[%s] ERROR: the login are not exist\n", getCurrentTime());
-       printf("err");
+        printf("[%s] ERROR: wrong login\n", getCurrentTime());
         return false;
     }
 
-    return true;
+    //check password
+    if (checkPassword(password, database))
+        return true;
+    else{
+         printf("[%s] ERROR: wrong password\n", getCurrentTime());
+        return false;
+    }
+
 }
 
 char *makeData(char *login, char *password) {
@@ -48,22 +55,20 @@ char *makeData(char *login, char *password) {
     return temp;
 }
 
-bool checkPassword(char *password, FILE *database, int pos_login){
-    //point on the line with login
-    fseek(database, 0, SEEK_SET);
-    fseek(database, 10, SEEK_SET);
+bool checkPassword(char *password, FILE *database){
+    //pointer is already in the line with login
 
     char *string = (char *) calloc(STR_LEN_MAX, sizeof(char));
     if (!string) exit(EXIT_FAILURE);
     char *stringbuf = (char *) calloc(STR_LEN_MAX, sizeof(char));
     if (!stringbuf) exit(EXIT_FAILURE);
 
+    //get password
     fgets(string, STR_LEN_MAX, database);
     stringbuf = strtok(string, ":");
     stringbuf = strtok(NULL, ":");
     stringbuf[strlen(stringbuf)-1] = '\0';
 
-    printf("%s - %s", password, stringbuf);
     if (!strcmp(password, stringbuf))
         return true;
     else
@@ -72,7 +77,7 @@ bool checkPassword(char *password, FILE *database, int pos_login){
 }
 
 bool stringFind(FILE *database, char *login, long file_size) {
-    //go to the begin of file
+    //go to the beginning of file
     fseek(database, 0, SEEK_SET);
 
     //buffer for checking
@@ -103,7 +108,7 @@ bool signUp(char *login, char *password) {
     //open file
     FILE *database = fopen("../data/users.txt", "rt");
     if (!database) {
-       // printf("[%s] ERROR: Error open database\n", getCurrentTime());
+        printf("[%s] ERROR: Error open database\n", getCurrentTime());
         return false;
     }
     fseek(database, 0, SEEK_END);
@@ -111,8 +116,7 @@ bool signUp(char *login, char *password) {
 
     //check database
     if (stringFind(database, login, file_size)) {
-      //  printf("[%s] ERROR: the login are already used\n", getCurrentTime());
-      printf("err");
+        printf("[%s] ERROR: the login are already used\n", getCurrentTime());
         return false;
     }
 
@@ -120,8 +124,7 @@ bool signUp(char *login, char *password) {
     char *data = makeData(login, password);
     database = fopen("../data/users.txt", "a");
     if (!database) {
-       // printf("[%s] ERROR: Error open database\n", getCurrentTime());
-        printf("err");
+        printf("[%s] ERROR: Error open database\n", getCurrentTime());
         return false;
     }
     fprintf(database, "%s", data);
@@ -131,9 +134,8 @@ bool signUp(char *login, char *password) {
 
 //TEST function
 int main(){
-   signUp("natis", "10002");
-   // FILE *database = fopen("../data/users.txt", "rt");
-  // checkPassword("1002", database);
+   signIn("natis", "100002");
+
   return 0;
 
 }
