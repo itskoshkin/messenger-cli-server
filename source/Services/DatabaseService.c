@@ -25,7 +25,6 @@ bool signIn(char *login, char *password) {
 
     //check database
     if (!stringFind(database, login, file_size)) {
-        printf("[%s] ERROR: wrong login\n", getCurrentTime());
         fclose(database);
         return false;
     }
@@ -36,7 +35,6 @@ bool signIn(char *login, char *password) {
         return true;
     }
     else{
-        printf("[%s] ERROR: Wrong password\n", getCurrentTime());
         fclose(database);
         return false;
     }
@@ -121,7 +119,6 @@ bool signUp(char *login, char *password) {
 
     //check database
     if (stringFind(database, login, file_size)) {
-        printf("[%s] ERROR: the login are already used\n", getCurrentTime());
         return false;
     }
 
