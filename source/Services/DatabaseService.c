@@ -36,7 +36,7 @@ bool signIn(char *login, char *password) {
         return true;
     }
     else{
-        printf("[%s] ERROR: wrong password\n", getCurrentTime());
+        printf("[%s] ERROR: Wrong password\n", getCurrentTime());
         fclose(database);
         return false;
     }
