@@ -42,8 +42,16 @@ void *clientHandler(void *param) {
     strcpy(password, login + i + 1);
     login[i] = '\0';
 
-    sprintf(transmit, "[%s] INFO: Client %llu login successful", getCurrentTime(), (SOCKET) param);
-    ret = send(clientSocket, transmit, sizeof(transmit), 0);
+    int isOk = (int) processingUser((bool) (receive[0] - '0'), login, password);
+
+    if (isOk) {
+        sprintf(transmit, "%d%c", isOk, '\0');
+        ret = send(clientSocket, transmit, sizeof(transmit), 0);
+        pthread_mutex_lock(&mutex);
+        printf("[%s] INFO: Client %llu login successful\n", getCurrentTime(), (SOCKET) param);
+        pthread_mutex_unlock(&mutex);
+    }
+
 
     if (ret == SOCKET_ERROR) {
         pthread_mutex_lock(&mutex);

@@ -3,3 +3,7 @@ nat:1002
 natis:1002
 natis:10002
 
+‚Stanis:123456
+‚nStanislav:123456
+‚ûStanislav:123456
+‚ìStanislav:123456
