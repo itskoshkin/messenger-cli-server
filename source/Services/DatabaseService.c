@@ -24,14 +24,18 @@ bool signIn(char *login, char *password) {
     //check database
     if (!stringFind(database, login, file_size)) {
         printf("[%s] ERROR: wrong login\n", getCurrentTime());
+        fclose(database);
         return false;
     }
 
     //check password
-    if (checkPassword(password, database))
+    if (checkPassword(password, database)) {
+        fclose(database);
         return true;
+    }
     else{
-         printf("[%s] ERROR: wrong password\n", getCurrentTime());
+        printf("[%s] ERROR: wrong password\n", getCurrentTime());
+        fclose(database);
         return false;
     }
 
@@ -74,6 +78,7 @@ bool openData(FILE *database) {
         printf("[%s] ERROR: Error open database\n", getCurrentTime());
         return false;
     }
+    return true;
 }
 
 bool stringFind(FILE *database, char *login, long file_size) {
@@ -124,12 +129,14 @@ bool signUp(char *login, char *password) {
     openData(database);
 
     fprintf(database, "%s", data);
+    fclose(database);
+
     return true;
 }
 
 //TEST function
 int main(){
-   signIn("natis", "100002");
+   signUp("ppppppnatis", "100002");
 
   return 0;
 
