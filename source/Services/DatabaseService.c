@@ -45,7 +45,7 @@ bool signIn(char *login, char *password) {
 
 char *makeData(char *login, char *password) {
     int size = strlen(login) + strlen(password) + 2;
-    char *temp = (char *) malloc(size);
+    char *temp = (char *)calloc(size, sizeof(char));
     strcat(temp, login);
     strcat(temp, ":");
     strcat(temp, password);
@@ -139,7 +139,6 @@ bool signUp(char *login, char *password) {
 //TEST function
 /*
 int main() {
-    signIn("natis", "100002");
+   // signIn("natis", "100002");
     return 0;
-}
- */
+}*/
