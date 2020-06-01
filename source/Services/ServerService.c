@@ -18,14 +18,14 @@ void *clientHandler(void *param) {
     SOCKET clientSocket = (SOCKET) param;
 
 
-    char recieve[1024];
+    char receive[1024];
     char transmit[1024];
     int ret;
-    ret = recv(clientSocket, recieve, 1024, 0);
+    ret = recv(clientSocket, receive, 1024, 0);
 
     //do {
-        //todo something
-    //} while (recieve > 0);
+    //todo something
+    //} while (receive > 0);
 
     if (!ret || ret == SOCKET_ERROR) {
         pthread_mutex_lock(&mutex);
@@ -34,20 +34,20 @@ void *clientHandler(void *param) {
         return (void *) 1;
     }
 
-    recieve[ret] = '\0';
+    receive[ret] = '\0';
     pthread_mutex_lock(&mutex);
-    printf("%s\n", recieve);
+    printf("%s\n", receive);
     pthread_mutex_unlock(&mutex);
     char login[64];
     char password[32];
-    strcpy(login, recieve+2);
+    strcpy(login, receive + 2);
     int i;
-    for(i=0;i<strlen(login);i++)
-        if(login[i] == ':')
+    for (i = 0; i < strlen(login); i++)
+        if (login[i] == ':')
             break;
-    strcpy(password, login+i+1);
+    strcpy(password, login + i + 1);
     login[i] = '\0';
-    sprintf(transmit, "%d%c", (int)processingUser((bool)(recieve[0]-'0'),login,password), '\0');
+    sprintf(transmit, "%d%c", (int) processingUser((bool) (receive[0] - '0'), login, password), '\0');
     ret = send(clientSocket, transmit, sizeof(transmit), 0);
 
     if (ret == SOCKET_ERROR) {
