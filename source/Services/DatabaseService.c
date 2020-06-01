@@ -95,7 +95,7 @@ bool stringFind(FILE *database, char *login, long file_size) {
         fgets(string, STR_LEN_MAX, database);
         stringbuf = strtok(string, ":");
 
-        printf("%s - %s\n", stringbuf, login);
+        //printf("%s - %s\n", stringbuf, login);
 
         //if the end of file
         if (ftell(database) == file_size) {
