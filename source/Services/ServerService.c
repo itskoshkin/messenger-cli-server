@@ -4,6 +4,7 @@
 
 #include "ServerService.h"
 #include "TimeService.h"
+#include "AuthService.h"
 
 #define PORT 8080
 
@@ -22,9 +23,9 @@ void *clientHandler(void *param) {
     int ret;
     ret = recv(clientSocket, recieve, 1024, 0);
 
-    do {
+    //do {
         //todo something
-    } while (recieve > 0);
+    //} while (recieve > 0);
 
     if (!ret || ret == SOCKET_ERROR) {
         pthread_mutex_lock(&mutex);
@@ -36,12 +37,17 @@ void *clientHandler(void *param) {
     recieve[ret] = '\0';
     pthread_mutex_lock(&mutex);
     printf("%s\n", recieve);
-
-
     pthread_mutex_unlock(&mutex);
-
-    printf(transmit, "[%s] %s %s %s\n", getCurrentTime(), "Your data", recieve, " was received");
-
+    char login[64];
+    char password[32];
+    strcpy(login, recieve+2);
+    int i;
+    for(i=0;i<strlen(login);i++)
+        if(login[i] == ':')
+            break;
+    strcpy(password, login+i+1);
+    login[i] = '\0';
+    sprintf(transmit, "%d%c", (int)processingUser((bool)(recieve[0]-'0'),login,password), '\0');
     ret = send(clientSocket, transmit, sizeof(transmit), 0);
 
     if (ret == SOCKET_ERROR) {
