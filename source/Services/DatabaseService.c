@@ -11,7 +11,9 @@
 #define STR_LEN_MAX 100
 
 bool stringFind(FILE *database, char *login, long file_size);
+
 bool checkPassword(char *password, FILE *database);
+
 bool openData(FILE *database);
 
 bool signIn(char *login, char *password) {
@@ -64,7 +66,7 @@ bool checkPassword(char *password, FILE *database){
     fgets(string, STR_LEN_MAX, database);
     stringbuf = strtok(string, ":");
     stringbuf = strtok(NULL, ":");
-    stringbuf[strlen(stringbuf)-1] = '\0';
+    stringbuf[strlen(stringbuf) - 1] = '\0';
 
     if (!strcmp(password, stringbuf))
         return true;
@@ -98,7 +100,7 @@ bool stringFind(FILE *database, char *login, long file_size) {
         fgets(string, STR_LEN_MAX, database);
         stringbuf = strtok(string, ":");
 
-        printf("%s - %s\n", stringbuf, login);
+        //printf("%s - %s\n", stringbuf, login);
 
         //if the end of file
         if (ftell(database) == file_size) {
@@ -135,9 +137,8 @@ bool signUp(char *login, char *password) {
 }
 
 //TEST function
-int main(){
-   signUp("ppppppnatis", "100002");
-
-  return 0;
-
+/*
+int main() {
+    signIn("natis", "100002");
+    return 0;
 }

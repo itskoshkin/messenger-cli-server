@@ -2,6 +2,6 @@
 #include "AuthService.h"
 
 bool processingUser(bool isRegistration, char *login, char *password) {
-    if (isRegistration) return signIn(login, password);
-    else return signUp(login, password);
+    if (isRegistration) return signUp(login, password);
+    else return signIn(login, password);
 }

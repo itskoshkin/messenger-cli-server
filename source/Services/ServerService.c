@@ -4,52 +4,64 @@
 
 #include "ServerService.h"
 #include "TimeService.h"
+#include "AuthService.h"
 
 #define PORT 8080
 
 pthread_mutex_t mutex;
 
-void *clientMessageHandler(SOCKET clientSocket) {
+void *clientMessageHandler(SOCKET *clientSocket) {
 
 }
 
 void *clientHandler(void *param) {
+    printf("[%s] INFO: Client %llu the client handler was successfully initialized\n", getCurrentTime(),
+           (SOCKET) param);
     SOCKET clientSocket = (SOCKET) param;
 
-
-    char recieve[1024];
+    char receive[1024];
     char transmit[1024];
-    int ret;
-    ret = recv(clientSocket, recieve, 1024, 0);
-
-    do {
-        //todo something
-    } while (recieve > 0);
-
+    int ret = recv(clientSocket, receive, 1024, 0);
     if (!ret || ret == SOCKET_ERROR) {
         pthread_mutex_lock(&mutex);
-        printf("[%s] ERROR: Error getting data\n", getCurrentTime());
+        printf("[%s] ERROR: Client %llu error getting data\n", getCurrentTime(), (SOCKET) param);
         pthread_mutex_unlock(&mutex);
         return (void *) 1;
     }
+    receive[ret] = '\0';
 
-    recieve[ret] = '\0';
     pthread_mutex_lock(&mutex);
-    printf("%s\n", recieve);
-
-
+    printf("[%s] INFO: Client %llu was receive an auth request: %s\n", getCurrentTime(), (SOCKET) param, receive);
     pthread_mutex_unlock(&mutex);
 
-    printf(transmit, "[%s] %s %s %s\n", getCurrentTime(), "Your data", recieve, " was received");
+    char login[64];
+    char password[32];
+    strcpy(login, receive + 2);
+    int i;
+    for (i = 0; i < strlen(login); i++) if (login[i] == ':') break;
+    strcpy(password, login + i + 1);
+    login[i] = '\0';
 
-    ret = send(clientSocket, transmit, sizeof(transmit), 0);
+    int isOk = (int) processingUser((bool) (receive[0] - '0'), login, password);
+
+    if (isOk) {
+        sprintf(transmit, "%d%c", isOk, '\0');
+        ret = send(clientSocket, transmit, sizeof(transmit), 0);
+        pthread_mutex_lock(&mutex);
+        printf("[%s] INFO: Client %llu login successful\n", getCurrentTime(), (SOCKET) param);
+        pthread_mutex_unlock(&mutex);
+    }
+
 
     if (ret == SOCKET_ERROR) {
         pthread_mutex_lock(&mutex);
-        printf("[%s] ERROR: Error sending data\n", getCurrentTime());
+        printf("[%s] ERROR: Client %llu error sending authorization success report\n", getCurrentTime(),
+               (SOCKET) param);
         pthread_mutex_unlock(&mutex);
         return (void *) 2;
     }
+
+    clientMessageHandler(&clientSocket);
 
     return (void *) 0;
 }
@@ -64,16 +76,12 @@ void clientAcceptor(SOCKET server) {
         printf("[%s] INFO: Client %llu was accepted\n", getCurrentTime(), client);
 
         if (client == INVALID_SOCKET) {
-            printf("[%s] WARN: Error accept client\n", getCurrentTime());
+            printf("[%s] WARN: Client %llu error accept client\n", getCurrentTime(), client);
             continue;
         }
         pthread_t mythread;
         int status = pthread_create(&mythread, NULL, clientHandler, (void *) client);
         pthread_detach(mythread);
-        /*
-         * crutch to avoid endless warnings
-         */
-        if (status == 3) break;
     }
     pthread_mutex_destroy(&mutex);
     printf("[%s] INFO: Server is stopped\n", getCurrentTime());
