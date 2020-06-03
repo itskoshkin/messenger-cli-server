@@ -9,7 +9,7 @@
 
 #ifndef SERVER_SERVERSERVICE_H
 
-int initServer();
+void initServer();
 
 #define SERVER_SERVERSERVICE_H
 
