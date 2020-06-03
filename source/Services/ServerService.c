@@ -165,11 +165,10 @@ void *clientHandler(void *param) {
         temp = temp->prev;
     }
 
-    /**
-     * FIXME Выход из потока...
-     */
-
     pthread_mutex_lock(&mutex);
+    if(!strcmp(currentClient->login, clientList->login))
+        clientList = clientList->prev;
+    deleteUser(currentClient);
     printf("[%s] INFO: Client %llu disconnected from server\n",
            getCurrentTime(), (SOCKET) param);
     pthread_mutex_unlock(&mutex);
