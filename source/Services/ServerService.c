@@ -25,6 +25,11 @@
 #define X(name) CAT(__##name, __LINE__) /* unique variable */
 
 pthread_mutex_t mutex;
+
+/**
+ * TODO FIXME Make a linkedlist or smth to deal with foreach cycle @SergeyBoryaev
+ */
+
 SOCKET clientSockets[MAXCONN];
 int CURRENT_CONN = 0;
 
@@ -37,7 +42,7 @@ void *clientHandler(void *param) {
 
     SOCKET clientSocket = (SOCKET) param;
 
-    char receive[1024], transmit[1024];
+    char receive[1024], transmit[1024], login[64];
     int isOk = 0, ret = 0;
 
     do {
@@ -47,6 +52,11 @@ void *clientHandler(void *param) {
             pthread_mutex_lock(&mutex);
             printf("[%s] ERROR: Client %llu error getting data\n", getCurrentTime(), clientSocket);
             pthread_mutex_unlock(&mutex);
+
+            /**
+             * TODO self termination of a thread and removal of a list of online sockets from a socket
+             */
+
             return (void *) 1;
         }
 
@@ -56,7 +66,7 @@ void *clientHandler(void *param) {
         printf("[%s] INFO: Client %llu was receive an auth request: %s\n", getCurrentTime(), clientSocket, receive);
         pthread_mutex_unlock(&mutex);
 
-        char password[32], login[64];
+        char password[32];
         strcpy(login, receive + 2);
         int i;
         for (i = 0; i < strlen(login); i++) if (login[i] == ':') break;
@@ -82,6 +92,11 @@ void *clientHandler(void *param) {
             printf("[%s] ERROR: Client %llu error sending authorization success report\n",
                    getCurrentTime(), (SOCKET) param);
             pthread_mutex_unlock(&mutex);
+
+            /**
+             * TODO self termination of a thread and removal of a list of online sockets from a socket
+             */
+
             return (void *) 2;
         }
 
@@ -98,12 +113,25 @@ void *clientHandler(void *param) {
             }
         }
 
+    /**
+     * FIXME Interrogates the current connection and notifies everyone else
+     */
 
     while (1) {
-        recv(clientSocket, receive, 1024, 0);
-        foreach(client in clientSockets) send(client, receive, 1024, 0);
+        if (recv(clientSocket, receive, 1024, 0) == SOCKET_ERROR) break;
+        foreach(client1 in clientSockets) send(client1, receive, 1024, 0);
     }
 
+    /*
+     * TODO FIXME Notify to all clients that this connection is leaving
+     */
+
+    sprintf(transmit, "%s leaving", login);
+    foreach(client2 in clientSockets) send(client2, transmit, 1024, 0);
+
+    /**
+     * TODO self termination of a thread and removal of a list of online sockets from a socket
+     */
     return (void *) 0;
 }
 
@@ -111,6 +139,7 @@ void clientAcceptor(SOCKET server) {
     int size;
     struct sockaddr_in sockaddrIn;
     SOCKET client;
+
     while (1) {
         size = sizeof(sockaddrIn);
         client = accept(server, (struct sockaddr *) &sockaddrIn, &size);
@@ -121,24 +150,33 @@ void clientAcceptor(SOCKET server) {
             continue;
         }
 
+        /*
+         * TODO add connection information to clients_list
+         */
 
         if (CURRENT_CONN == 50) exit(EXIT_FAILURE);
         clientSockets[CURRENT_CONN] = client;
         CURRENT_CONN++;
 
         pthread_t pthread;
-        int status = pthread_create(&pthread, NULL, clientHandler, (void *) client);
+        pthread_create(&pthread, NULL, clientHandler, (void *) client);
         pthread_detach(pthread);
+
+        /*
+         * TODO removing connection information from clients_list
+         */
     }
+
     pthread_mutex_destroy(&mutex);
     printf("[%s] INFO: Server is stopped\n", getCurrentTime());
     closesocket(server);
 }
 
 
-int initServer() {
+void initServer() {
     SOCKET server = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
-    if (server == INVALID_SOCKET) {
+
+    if (server == SOCKET_ERROR) {
         printf("[%s] ERROR: Error create server\n", getCurrentTime());
         exit(EXIT_FAILURE);
     }
@@ -153,10 +191,8 @@ int initServer() {
         exit(EXIT_FAILURE);
     } else {
         printf("[%s] INFO: Server started\n", getCurrentTime());
+        listen(server, MAXCONN);
+        pthread_mutex_init(&mutex, NULL);
+        clientAcceptor(server);
     }
-
-    listen(server, MAXCONN);
-    pthread_mutex_init(&mutex, NULL);
-    clientAcceptor(server);
-    return 0;
 }
