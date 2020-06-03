@@ -21,17 +21,6 @@ void deleteUser(struct client *targetUser){
     free(targetUser);
 }
 
-struct client *makeFirstUser(SOCKET firstUser, char *login){
-    struct client* firstUserStruct = (struct client*)malloc(sizeof(struct client));
-    firstUserStruct->client = firstUser;
-    firstUserStruct->next = NULL;
-    firstUserStruct->prev = NULL;
-    firstUserStruct->login = (char *)calloc(strlen(login)+1, sizeof(char));
-    strcpy(firstUserStruct->login, login);
-    firstUserStruct->IsOnline = true;
-    return firstUserStruct;
-}
-
 struct client *findByLogin(char *login, struct client *lastUser){
     struct client *temp = lastUser;
     while (lastUser){
@@ -42,7 +31,7 @@ struct client *findByLogin(char *login, struct client *lastUser){
     return  NULL;
 }
 
-struct client *connectNewUser(char *login, struct client *lastUser, SOCKET newUser){
+struct client *connectNewUser(struct client *lastUser, SOCKET newUser, char *login){
     struct client *User;
     if(User = findByLogin(login, lastUser)){
         User->IsOnline = true;

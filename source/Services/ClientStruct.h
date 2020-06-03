@@ -21,8 +21,7 @@ typedef struct client
 
 struct client *addUser(struct client *lastUser, SOCKET newUser, char *login);
 void deleteUser(struct client *targetUser);
-struct client *makeFirstUser(SOCKET firstUser, char *login);
 struct client *findByLogin(char *login, struct client *lastUser);
-struct client *connectNewUser(char *login, struct client *lastUser, SOCKET newUser);
+struct client *connectNewUser(struct client *lastUser, SOCKET newUser, char *login);
 
 #endif //SERVER_CLIENTSTRUCT_H
