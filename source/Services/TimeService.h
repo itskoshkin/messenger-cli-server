@@ -1,5 +1,5 @@
 /**
- * @authors Stanislav Stoianov, Daria Pavlova
+ * @authors Stanislav Stoianov
  */
 
 #ifndef SERVER_TIMESERVICE_H
@@ -8,4 +8,4 @@ char * getCurrentTime();
 
 #define SERVER_TIMESERVICE_H
 
-#endif //SERVER_TIMESERVICE_H
+#endif

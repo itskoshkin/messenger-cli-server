@@ -1,3 +1,7 @@
+/**
+ * @authors Stanislav Stoianov
+ */
+
 #include "DatabaseService.h"
 #include "AuthService.h"
 

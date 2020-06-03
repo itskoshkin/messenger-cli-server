@@ -1,5 +1,5 @@
 /**
- * @authors Stanislav Stoianov, Daria Pavlova
+ * @authors Stanislav Stoianov
  */
 
 #ifndef SERVER_AUTHSERVICE_H
