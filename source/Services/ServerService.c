@@ -5,57 +5,43 @@
 #include "ServerService.h"
 #include "TimeService.h"
 #include "AuthService.h"
+#include "ClientStruct.h"
 
 #define PORT 8080
 #define MAXCONN 50
 
-#define FOREACH(type, item, array, size) \
-    size_t X(keep), X(i); \
-    type item; \
-    for (X(keep) = 1, X(i) = 0 ; X(i) < (size); X(keep) = !X(keep), X(i)++) \
-        for (item = (array)[X(i)]; X(keep); X(keep) = 0)
-
-#define _foreach(item, array) FOREACH(__typeof__(array[0]), item, array, length(array))
-#define foreach(item_in_array) _foreach(item_in_array)
-
-#define in ,
-#define length(array) (sizeof(array) / sizeof((array)[0]))
-#define CAT(a, b) CAT_HELPER(a, b) /* Concatenate two symbols for macros! */
-#define CAT_HELPER(a, b) a ## b
-#define X(name) CAT(__##name, __LINE__) /* unique variable */
-
 pthread_mutex_t mutex;
-
-/**
- * TODO FIXME Make a linkedlist or smth to deal with foreach cycle @SergeyBoryaev
- */
-
-SOCKET clientSockets[MAXCONN];
-int CURRENT_CONN = 0;
-
+Client clientList;
 
 void *clientHandler(void *param) {
     pthread_mutex_lock(&mutex);
-    printf("[%s] INFO: Client %llu the client handler was successfully initialized\n",
+    printf("[%s] INFO: Client %llu the Client handler was successfully initialized\n",
            getCurrentTime(), (SOCKET) param);
     pthread_mutex_unlock(&mutex);
 
-    SOCKET clientSocket = (SOCKET) param;
 
     char receive[1024], transmit[1024], login[64];
     int isOk, ret;
+    Client currentClient;
+    SOCKET clientSocket = (SOCKET) param;
+
+    /**
+     * AUTH
+     */
 
     do {
         ret = recv(clientSocket, receive, 1024, 0);
 
         if (!ret || ret == SOCKET_ERROR) {
             pthread_mutex_lock(&mutex);
-            printf("[%s] ERROR: Client %llu error getting data\n", getCurrentTime(), clientSocket);
+            printf("[%s] ERROR: Client %llu error getting auth data\n", getCurrentTime(), clientSocket);
             pthread_mutex_unlock(&mutex);
 
-            /**
-             * TODO self termination of a thread and removal of a list of online sockets from a socket
+            pthread_mutex_lock(&mutex);
+            /*
+             * TODO removing connection
              */
+            pthread_mutex_unlock(&mutex);
 
             return (void *) 1;
         }
@@ -80,8 +66,20 @@ void *clientHandler(void *param) {
             ret = send(clientSocket, transmit, 1024, 0);
             pthread_mutex_lock(&mutex);
             printf("[%s] INFO: Client %llu login successful\n", getCurrentTime(), (SOCKET) param);
+
+            /*
+             * TODO add connection information to clients_list
+             */
+
+            currentClient = addUser(&clientList, clientSocket, login);
+            currentClient = connectNewUser(&clientList, clientSocket, login);
+            if (clientList.next) clientList = clientList.next;
+
+            printf("[%s] INFO: Client %llu successfully added to the mailing list\n", getCurrentTime(), (SOCKET) param);
             pthread_mutex_unlock(&mutex);
+
             sprintf(transmit, "%s is online!", login);
+
         } else {
             sprintf(transmit, "%d%c", isOk, '\0');
             ret = send(clientSocket, transmit, 1024, 0);
@@ -91,51 +89,95 @@ void *clientHandler(void *param) {
             pthread_mutex_lock(&mutex);
             printf("[%s] ERROR: Client %llu error sending authorization success report\n",
                    getCurrentTime(), (SOCKET) param);
-            pthread_mutex_unlock(&mutex);
 
-            /**
-             * TODO self termination of a thread and removal of a list of online sockets from a socket
+            /*
+             * TODO removing connection information from clients_list
              */
+            deleteUser(currentClient);
+
+            printf("[%s] INFO: Client %llu successfully removed from the mailing list\n",
+                   getCurrentTime(), (SOCKET) param);
+            pthread_mutex_unlock(&mutex);
 
             return (void *) 2;
         }
 
     } while (!isOk);
 
-    foreach(client in clientSockets) {
-            ret = send(client, transmit, sizeof(transmit), 0);
-            if (ret == SOCKET_ERROR) {
-                pthread_mutex_lock(&mutex);
-                printf("[%s] ERROR: Client %llu did not receive a message about new user\n",
-                       getCurrentTime(), (SOCKET) param);
-                pthread_mutex_unlock(&mutex);
-            }
-        }
 
     /**
-     * FIXME Interrogates the current connection and notifies everyone else
+     * TODO Notify all users about a new user
+     */
+
+    while (clientList.next) {
+        ret = send(clientList.client, transmit, 1024, 0);
+        if (ret == SOCKET_ERROR) {
+            pthread_mutex_lock(&mutex);
+            printf("[%s] ERROR: Client %llu did not receive a message about new user\n",
+                   getCurrentTime(), (SOCKET) param);
+            /*
+             * TODO removing connection information from clients_list
+             */
+            deleteUser(currentClient);
+
+            printf("[%s] INFO: Client %llu successfully removed from the mailing list\n",
+                   getCurrentTime(), (SOCKET) param);
+            pthread_mutex_unlock(&mutex);
+        }
+    }
+
+    /**
+     * FIXME Опрашивает текущее соединение и уведомляет всех остальных
      */
 
     while (1) {
-        if (recv(clientSocket, receive, 1024, 0) == SOCKET_ERROR) break;
-        foreach(client1 in clientSockets) send(client1, receive, 1024, 0);
+        //опросить текущее соединение
+        ret = recv(clientSocket, receive, 1024, 0);
+
+        //ошибка? удаление из списка активных соединений,
+        if (ret == SOCKET_ERROR) {
+            pthread_mutex_lock(&mutex);
+            printf("[%s] ERROR: Client %llu did not receive a message about new user\n",
+                   getCurrentTime(), (SOCKET) param);
+            /*
+             * TODO removing connection information from clients_list
+             */
+            deleteUser(currentClient);
+
+            printf("[%s] INFO: Client %llu successfully removed from the mailing list\n",
+                   getCurrentTime(), (SOCKET) param);
+            pthread_mutex_unlock(&mutex);
+            break;
+        }
+
+        //прислать всем остальным соединениям сообщение полученное от пользователя
+        while (clientList.next) {
+            send(clientList.client, receive, 1024, 0);
+        }
     }
 
     /*
-     * TODO FIXME Notify to all clients that this connection is leaving
+     * FIXME Уведомить всех клиентов о том, что это пользователь отключился
      */
 
     sprintf(transmit, "%s leaving", login);
-    foreach(client2 in clientSockets) send(client2, transmit, 1024, 0);
+    while (clientList.next) {
+        send(clientList.next, transmit, 1024, 0);
+    }
 
     /**
-     * TODO self termination of a thread and removal of a list of online sockets from a socket
+     * FIXME Выход из потока...
      */
+
+    pthread_mutex_lock(&mutex);
+    printf("[%s] INFO: Client %llu disconnected from server\n",
+           getCurrentTime(), (SOCKET) param);
+    pthread_mutex_unlock(&mutex);
 
     return (void *) 0;
 }
 
-void clientAcceptor(SOCKET server) {
+_Noreturn void clientAcceptor(SOCKET server) {
     int size;
     struct sockaddr_in sockaddrIn;
     SOCKET client;
@@ -146,32 +188,20 @@ void clientAcceptor(SOCKET server) {
         printf("[%s] INFO: Client %llu was accepted\n", getCurrentTime(), client);
 
         if (client == SOCKET_ERROR) {
-            printf("[%s] WARN: Client %llu error accept client\n", getCurrentTime(), client);
+            printf("[%s] WARN: Client %llu error accept Client\n", getCurrentTime(), client);
             continue;
         }
-
-        /*
-         * TODO add connection information to clients_list
-         */
-
-        if (CURRENT_CONN == 50) exit(EXIT_FAILURE);
-        clientSockets[CURRENT_CONN] = client;
-        CURRENT_CONN++;
 
         pthread_t pthread;
         pthread_create(&pthread, NULL, clientHandler, (void *) client);
         pthread_detach(pthread);
 
-        /*
-         * TODO removing connection information from clients_list
-         */
     }
 
-    /*
     pthread_mutex_destroy(&mutex);
     printf("[%s] INFO: Server is stopped\n", getCurrentTime());
     closesocket(server);
-     */
+
 }
 
 
