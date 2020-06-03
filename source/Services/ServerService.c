@@ -43,7 +43,7 @@ void *clientHandler(void *param) {
     SOCKET clientSocket = (SOCKET) param;
 
     char receive[1024], transmit[1024], login[64];
-    int isOk = 0, ret = 0;
+    int isOk, ret;
 
     do {
         ret = recv(clientSocket, receive, 1024, 0);
@@ -167,9 +167,11 @@ void clientAcceptor(SOCKET server) {
          */
     }
 
+    /*
     pthread_mutex_destroy(&mutex);
     printf("[%s] INFO: Server is stopped\n", getCurrentTime());
     closesocket(server);
+     */
 }
 
 
