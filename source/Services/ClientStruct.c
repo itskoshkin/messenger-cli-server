@@ -1,11 +1,12 @@
-//
-// Created by Sergey on 6/3/2020.
-//
+/**
+ * @authors Sergey Boryaev
+ */
+
 
 #include "ClientStruct.h"
 
-struct client *addUser(struct client *lastUser, SOCKET newUser, char *login){
-    struct client* nextUser = (struct client*)malloc(sizeof(struct client));
+struct Client *addUser(struct Client *lastUser, SOCKET newUser, char *login) {
+    struct Client *nextUser = (struct Client *) malloc(sizeof(struct Client));
     lastUser->next = nextUser;
     nextUser->prev = lastUser;
     nextUser->client = newUser;
@@ -14,30 +15,30 @@ struct client *addUser(struct client *lastUser, SOCKET newUser, char *login){
     return nextUser;
 }
 
-void deleteUser(struct client *targetUser){
+void deleteUser(struct Client *targetUser) {
     targetUser->prev->next = targetUser->next;
     targetUser->next->prev = targetUser->prev;
     free(targetUser->login);
     free(targetUser);
 }
 
-struct client *findByLogin(char *login, struct client *lastUser){
-    struct client *temp = lastUser;
-    while (lastUser){
-        if(!strcmp(login,temp->login))
+struct Client *findByLogin(char *login, struct Client *lastUser) {
+    struct Client *temp = lastUser;
+    while (lastUser) {
+        if (!strcmp(login, temp->login))
             return temp;
-        temp=temp->prev;
+        temp = temp->prev;
     }
-    return  NULL;
+    return NULL;
 }
 
-struct client *connectNewUser(struct client *lastUser, SOCKET newUser, char *login){
-    struct client *User;
-    if(User = findByLogin(login, lastUser)){
+struct Client *connectNewUser(struct Client *lastUser, SOCKET newUser, char *login) {
+    struct Client *User;
+    User = findByLogin(login, lastUser);
+    if (User) {
         User->IsOnline = true;
         User->client = newUser;
-    }
-    else
+    } else
         User = addUser(lastUser, newUser, login);
     return User;
 }
