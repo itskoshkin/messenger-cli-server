@@ -11,7 +11,7 @@
 #define MAXCONN 50
 
 pthread_mutex_t mutex;
-Client clientList;
+Client* clientList;
 
 void *clientHandler(void *param) {
     pthread_mutex_lock(&mutex);
@@ -22,7 +22,7 @@ void *clientHandler(void *param) {
 
     char receive[1024], transmit[1024], login[64];
     int isOk, ret;
-    Client currentClient;
+    Client* currentClient;
     SOCKET clientSocket = (SOCKET) param;
 
     /**
@@ -71,9 +71,9 @@ void *clientHandler(void *param) {
              * TODO add connection information to clients_list
              */
 
-            currentClient = addUser(&clientList, clientSocket, login);
-            currentClient = connectNewUser(&clientList, clientSocket, login);
-            if (clientList.next) clientList = clientList.next;
+            currentClient = addUser(clientList, clientSocket, login);
+            currentClient = connectNewUser(clientList, clientSocket, login);
+            if (clientList->next) clientList = clientList->next;
 
             printf("[%s] INFO: Client %llu successfully added to the mailing list\n", getCurrentTime(), (SOCKET) param);
             pthread_mutex_unlock(&mutex);
