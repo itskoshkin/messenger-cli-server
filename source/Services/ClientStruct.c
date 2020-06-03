@@ -7,11 +7,11 @@
 
 struct Client *addUser(struct Client *lastUser, SOCKET newUser, char *login) {
     struct Client *nextUser = (struct Client *) malloc(sizeof(struct Client));
-    lastUser->next = nextUser;
     nextUser->prev = lastUser;
     nextUser->client = newUser;
     nextUser->next = NULL;
     nextUser->IsOnline = true;
+    lastUser->next = nextUser;
     return nextUser;
 }
 
