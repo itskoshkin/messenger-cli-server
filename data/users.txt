@@ -1,9 +1,1 @@
 [username]:[password]
-nat:1002
-natis:1002
-natis:10002
-
-‚rStanis:123456
-‚{Stanissss:123456
-‚tStanislav:123456
-ğ­ºğ­ºğ­ºğ­ºğ­ºîş««««««««««««««««îşîşîşîşîşTheBugEvidence:123456
