@@ -10,36 +10,9 @@
 
 #define STR_LEN_MAX 100
 
-bool stringFind(FILE *database, char *login, long file_size);
-
-bool checkPassword(char *password, FILE *database);
+bool stringFind(FILE *database, char *login, long file_size, int passwordcheck, char *password);
 
 bool openData(FILE *database);
-
-bool signIn(char *login, char *password) {
-    //open file
-    FILE *database = fopen("../data/users.txt", "rt");
-    openData(database);
-    fseek(database, 0, SEEK_END);
-    long file_size = ftell(database);
-
-    //check database
-    if (!stringFind(database, login, file_size)) {
-        fclose(database);
-        return false;
-    }
-
-    //check password
-    if (checkPassword(password, database)) {
-        fclose(database);
-        return true;
-    }
-    else{
-        fclose(database);
-        return false;
-    }
-
-}
 
 char *makeData(char *login, char *password) {
     int size = strlen(login) + strlen(password) + 2;
@@ -52,45 +25,23 @@ char *makeData(char *login, char *password) {
     return temp;
 }
 
-bool checkPassword(char *password, FILE *database){
-    //pointer is already in the line with login
-
-    char *string = (char *) calloc(STR_LEN_MAX, sizeof(char));
-    if (!string) exit(EXIT_FAILURE);
-    char *stringbuf = (char *) calloc(STR_LEN_MAX, sizeof(char));
-    if (!stringbuf) exit(EXIT_FAILURE);
-
-    //getting password
-    fgets(string, STR_LEN_MAX, database);
-    stringbuf = strtok(string, ":");
-    stringbuf = strtok(NULL, ":");
-    stringbuf[strlen(stringbuf) - 1] = '\0';
-
-    if (!strcmp(password, stringbuf))
-        return true;
-    else
-        return false;
-
-}
-
 bool openData(FILE *database) {
     if (!database) {
-        printf("[%s] ERROR: Error open database\n", getCurrentTime());
+       printf("[%s] ERROR: Error open database\n", getCurrentTime());
         return false;
     }
     return true;
 }
 
-bool stringFind(FILE *database, char *login, long file_size) {
+bool stringFind(FILE *database, char *login, long file_size, int passwordcheck, char *password) {
     //go to the beginning of file
     fseek(database, 0, SEEK_SET);
 
     //buffer for checking
-    char *string = (char *) calloc(STR_LEN_MAX, sizeof(char));
+    char* string = (char *) calloc(STR_LEN_MAX, sizeof(char));
     if (!string) exit(EXIT_FAILURE);
     char *stringbuf = (char *) calloc(STR_LEN_MAX, sizeof(char));
     if (!stringbuf) exit(EXIT_FAILURE);
-
 
     //skip the strings while it is not a neccessary key
     while (strcmp(stringbuf, login)) {
@@ -98,12 +49,36 @@ bool stringFind(FILE *database, char *login, long file_size) {
         fgets(string, STR_LEN_MAX, database);
         stringbuf = strtok(string, ":");
 
-        //printf("%s - %s\n", stringbuf, login);
 
         //if the end of file
-        if (ftell(database) == file_size) {
+        if (ftell(database) == file_size && strcmp(stringbuf, login)) {
             return false;
         }
+    }
+
+    if (passwordcheck){
+        stringbuf = strtok(NULL, ":");
+        stringbuf[strlen(stringbuf) - 1] = '\0';
+        if (!strcmp(password, stringbuf))
+            return true;
+        else
+            return false;
+    }
+
+    return true;
+}
+
+bool signIn(char *login, char *password) {
+    //open file
+    FILE *database = fopen("../data/users.txt", "rt");
+    openData(database);
+    fseek(database, 0, SEEK_END);
+    long file_size = ftell(database);
+
+    //check database
+    if (!stringFind(database, login, file_size, 1, password)) {
+        fclose(database);
+        return false;
     }
 
     return true;
@@ -116,9 +91,8 @@ bool signUp(char *login, char *password) {
 
     fseek(database, 0, SEEK_END);
     long file_size = ftell(database);
-
     //check database
-    if (stringFind(database, login, file_size)) {
+    if (stringFind(database, login, file_size, 0, 0)) {
         return false;
     }
 
@@ -136,6 +110,13 @@ bool signUp(char *login, char *password) {
 //TEST function
 /*
 int main() {
-   // signIn("natis", "100002");
+    if (!signIn("Daria", "mypassword"))
+        printf("wrong");
+    signUp("STASS", "PASSWORD");
+    signUp("SERYOZHENKA", "TUTPAROL");
+    if (!signIn("SERYOZHENKA", "TUTPAROL"))
+        printf("wrong");
+    if (!signIn("STASS", "PASSWORD"))
+        printf("wrong");
     return 0;
 }*/
