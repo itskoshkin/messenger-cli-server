@@ -132,6 +132,7 @@ void *clientHandler(void *param) {
     /**
      * TODO self termination of a thread and removal of a list of online sockets from a socket
      */
+
     return (void *) 0;
 }
 
