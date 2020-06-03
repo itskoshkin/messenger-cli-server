@@ -1,27 +1,30 @@
-//
-// Created by Sergey on 6/3/2020.
-//
-
-#ifndef SERVER_CLIENTSTRUCT_H
-#define SERVER_CLIENTSTRUCT_H
+/**
+ * @authors Sergey Boryaev
+ */
 
 #include <stdbool.h>
 #include <winsock2.h>
 #include <malloc.h>
 #include <string.h>
 
-typedef struct client
-{
-    char* login;
+#ifndef SERVER_CLIENTSTRUCT_H
+
+typedef struct Client {
+    char *login;
     bool IsOnline;
     SOCKET client;
-    struct client* next;
-    struct client* prev;
-}CLIENT;
+    struct Client *next;
+    struct Client *prev;
+} Client;
 
-struct client *addUser(struct client *lastUser, SOCKET newUser, char *login);
-void deleteUser(struct client *targetUser);
-struct client *findByLogin(char *login, struct client *lastUser);
-struct client *connectNewUser(struct client *lastUser, SOCKET newUser, char *login);
+struct Client *addUser(struct Client *lastUser, SOCKET newUser, char *login);
 
-#endif //SERVER_CLIENTSTRUCT_H
+void deleteUser(struct Client *targetUser);
+
+struct Client *findByLogin(char *login, struct Client *lastUser);
+
+struct Client *connectNewUser(struct Client *lastUser, SOCKET newUser, char *login);
+
+#define SERVER_CLIENTSTRUCT_H
+
+#endif
