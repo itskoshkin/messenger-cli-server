@@ -102,7 +102,6 @@ void *clientHandler(void *param) {
 
     } while (!isOk);
 
-
     foreach(client in clientSockets) {
             ret = send(client, transmit, sizeof(transmit), 0);
             if (ret == SOCKET_ERROR) {
