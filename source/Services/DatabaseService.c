@@ -1,5 +1,5 @@
 /**
- * @authors Stanislav Stoianov, Daria Pavlova
+ * @authors Daria Pavlova
  */
 
 #include "DatabaseService.h"

@@ -1,5 +1,5 @@
 /**
- * @authors Stanislav Stoianov, Daria Pavlova
+ * @authors Stanislav Stoianov, Daria Pavlova, Sergey Boryaev
  */
 
 #include "Services/ServerService.h"
