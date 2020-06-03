@@ -4,15 +4,30 @@
 
 
 #include "ClientStruct.h"
+struct Client *init(SOCKET newUser, char *login){
 
+}
 struct Client *addUser(struct Client *lastUser, SOCKET newUser, char *login) {
-    struct Client *nextUser = (struct Client *) malloc(sizeof(struct Client));
-    nextUser->prev = lastUser;
-    nextUser->client = newUser;
-    nextUser->next = NULL;
-    nextUser->IsOnline = true;
-    lastUser->next = nextUser;
-    return nextUser;
+    if (lastUser) {
+        struct Client *nextUser = (struct Client *) malloc(sizeof(struct Client));
+        nextUser->prev = lastUser;
+        nextUser->client = newUser;
+        nextUser->next = NULL;
+        nextUser->IsOnline = true;
+        nextUser->login = login;
+        lastUser->next = nextUser;
+        return nextUser;
+    }
+    else {
+        lastUser = (struct Client *) malloc(sizeof(struct Client));
+        lastUser->prev = NULL;
+        lastUser->next = NULL;
+        lastUser->IsOnline = true;
+        lastUser->client = newUser;
+        lastUser->login = login;
+        return lastUser;
+    }
+
 }
 
 void deleteUser(struct Client *targetUser) {
