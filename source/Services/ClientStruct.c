@@ -10,6 +10,7 @@ struct client *addUser(struct client *lastUser, SOCKET newUser, char *login){
     nextUser->prev = lastUser;
     nextUser->client = newUser;
     nextUser->next = NULL;
+    nextUser->IsOnline = true;
     return nextUser;
 }
 
@@ -27,6 +28,7 @@ struct client *makeFirstUser(SOCKET firstUser, char *login){
     firstUserStruct->prev = NULL;
     firstUserStruct->login = (char *)calloc(strlen(login)+1, sizeof(char));
     strcpy(firstUserStruct->login, login);
+    firstUserStruct->IsOnline = true;
     return firstUserStruct;
 }
 
@@ -38,4 +40,15 @@ struct client *findByLogin(char *login, struct client *lastUser){
         temp=temp->prev;
     }
     return  NULL;
+}
+
+struct client *connectNewUser(char *login, struct client *lastUser, SOCKET newUser){
+    struct client *User;
+    if(User = findByLogin(login, lastUser)){
+        User->IsOnline = true;
+        User->client = newUser;
+    }
+    else
+        User = addUser(lastUser, newUser, login);
+    return User;
 }

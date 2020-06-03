@@ -13,6 +13,7 @@
 typedef struct client
 {
     char* login;
+    bool IsOnline;
     SOCKET client;
     struct client* next;
     struct client* prev;
@@ -22,5 +23,6 @@ struct client *addUser(struct client *lastUser, SOCKET newUser, char *login);
 void deleteUser(struct client *targetUser);
 struct client *makeFirstUser(SOCKET firstUser, char *login);
 struct client *findByLogin(char *login, struct client *lastUser);
+struct client *connectNewUser(char *login, struct client *lastUser, SOCKET newUser);
 
 #endif //SERVER_CLIENTSTRUCT_H
