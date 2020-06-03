@@ -14,6 +14,7 @@ pthread_mutex_t mutex;
 Client* clientList;
 
 void *clientHandler(void *param) {
+    Client *temp;
     pthread_mutex_lock(&mutex);
     printf("[%s] INFO: Client %llu the Client handler was successfully initialized\n",
            getCurrentTime(), (SOCKET) param);
@@ -38,9 +39,9 @@ void *clientHandler(void *param) {
             pthread_mutex_unlock(&mutex);
 
             pthread_mutex_lock(&mutex);
-            /*
-             * TODO removing connection
-             */
+            if(!strcmp(currentClient->login, clientList->login))
+                clientList = clientList->prev;
+            deleteUser(currentClient);
             pthread_mutex_unlock(&mutex);
 
             return (void *) 1;
@@ -66,15 +67,8 @@ void *clientHandler(void *param) {
             ret = send(clientSocket, transmit, 1024, 0);
             pthread_mutex_lock(&mutex);
             printf("[%s] INFO: Client %llu login successful\n", getCurrentTime(), (SOCKET) param);
-
-            /*
-             * TODO add connection information to clients_list
-             */
-
-            currentClient = addUser(clientList, clientSocket, login);
             currentClient = connectNewUser(clientList, clientSocket, login);
             if (clientList->next) clientList = clientList->next;
-
             printf("[%s] INFO: Client %llu successfully added to the mailing list\n", getCurrentTime(), (SOCKET) param);
             pthread_mutex_unlock(&mutex);
 
@@ -90,9 +84,8 @@ void *clientHandler(void *param) {
             printf("[%s] ERROR: Client %llu error sending authorization success report\n",
                    getCurrentTime(), (SOCKET) param);
 
-            /*
-             * TODO removing connection information from clients_list
-             */
+            if(!strcmp(currentClient->login, clientList->login))
+                clientList = clientList->prev;
             deleteUser(currentClient);
 
             printf("[%s] INFO: Client %llu successfully removed from the mailing list\n",
@@ -103,27 +96,24 @@ void *clientHandler(void *param) {
         }
 
     } while (!isOk);
-
-
-    /**
-     * TODO Notify all users about a new user
-     */
-
-    while (clientList.next) {
-        ret = send(clientList.client, transmit, 1024, 0);
+    //уведомление о коннкекте
+    sprintf(transmit, "%s connected!", currentClient->login);
+    temp = clientList;
+    while (temp->prev) {
+        ret = send(clientList->client, transmit, 1024, 0);
         if (ret == SOCKET_ERROR) {
             pthread_mutex_lock(&mutex);
             printf("[%s] ERROR: Client %llu did not receive a message about new user\n",
                    getCurrentTime(), (SOCKET) param);
-            /*
-             * TODO removing connection information from clients_list
-             */
+            if(!strcmp(currentClient->login, clientList->login))
+                clientList = clientList->prev;
             deleteUser(currentClient);
 
             printf("[%s] INFO: Client %llu successfully removed from the mailing list\n",
                    getCurrentTime(), (SOCKET) param);
             pthread_mutex_unlock(&mutex);
         }
+        temp = temp->prev;
     }
 
     /**
@@ -139,9 +129,8 @@ void *clientHandler(void *param) {
             pthread_mutex_lock(&mutex);
             printf("[%s] ERROR: Client %llu did not receive a message about new user\n",
                    getCurrentTime(), (SOCKET) param);
-            /*
-             * TODO removing connection information from clients_list
-             */
+            if(!strcmp(currentClient->login, clientList->login))
+                clientList = clientList->prev;
             deleteUser(currentClient);
 
             printf("[%s] INFO: Client %llu successfully removed from the mailing list\n",
@@ -150,19 +139,30 @@ void *clientHandler(void *param) {
             break;
         }
 
-        //прислать всем остальным соединениям сообщение полученное от пользователя
-        while (clientList.next) {
-            send(clientList.client, receive, 1024, 0);
+
+        while (clientList->prev) {
+            send(clientList->client, receive, 1024, 0);
         }
     }
 
-    /*
-     * FIXME Уведомить всех клиентов о том, что это пользователь отключился
-     */
-
+    //уведомление о выходе
     sprintf(transmit, "%s leaving", login);
-    while (clientList.next) {
-        send(clientList.next, transmit, 1024, 0);
+    temp = clientList;
+    while (temp->prev) {
+        ret = send(clientList->client, transmit, 1024, 0);
+        if (ret == SOCKET_ERROR) {
+            pthread_mutex_lock(&mutex);
+            printf("[%s] ERROR: Client %llu did not receive a message about new user\n",
+                   getCurrentTime(), (SOCKET) param);
+            if(!strcmp(currentClient->login, clientList->login))
+                clientList = clientList->prev;
+            deleteUser(currentClient);
+
+            printf("[%s] INFO: Client %llu successfully removed from the mailing list\n",
+                   getCurrentTime(), (SOCKET) param);
+            pthread_mutex_unlock(&mutex);
+        }
+        temp = temp->prev;
     }
 
     /**
