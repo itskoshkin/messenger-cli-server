@@ -74,8 +74,6 @@ void *clientHandler(void *param) {
             printf("[%s] INFO: Client %llu successfully added to the mailing list\n", getCurrentTime(), (SOCKET) param);
             pthread_mutex_unlock(&mutex);
 
-            sprintf(transmit, "%s is online!", login);
-
         } else {
             sprintf(transmit, "%d%c", isOk, '\0');
             ret = send(clientSocket, transmit, 1024, 0);
@@ -99,7 +97,7 @@ void *clientHandler(void *param) {
 
     } while (!isOk);
     //уведомление о коннкекте
-    sprintf(transmit, "%s connected!", currentClient->login);
+    sprintf(transmit, "%s is online!", currentClient->login);
     temp = clientList;
     while (temp->prev) {
         ret = send(clientList->client, transmit, 1024, 0);
