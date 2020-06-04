@@ -77,9 +77,12 @@ void *clientHandler(void *param) {
             printf("[%s] ERROR: Client %llu error sending authorization success report\n",
                    getCurrentTime(), (SOCKET) param);
 
-            if(!strcmp(currentClient->login, clientList->login))
+            if(!strcmp(currentClient->login, clientList->login) && currentClient->prev) {
                 clientList = clientList->prev;
-            deleteUser(currentClient);
+                deleteUser(currentClient);
+            }
+            else
+                deleteUser(currentClient);
 
             printf("[%s] INFO: Client %llu successfully removed from the mailing list\n",
                    getCurrentTime(), (SOCKET) param);
@@ -98,10 +101,13 @@ void *clientHandler(void *param) {
             pthread_mutex_lock(&mutex);
             printf("[%s] ERROR: Client %llu did not receive a message about new user\n",
                    getCurrentTime(), temp->client);
-            if (!strcmp(temp->login, clientList->login))
+            if (!strcmp(temp->login, clientList->login) && (temp->prev)) {
                 clientList = clientList->prev;
-            temp = temp->prev;
-            deleteUser(temp->next);
+                temp = temp->prev;
+                deleteUser(temp->next);
+            }
+            else
+                deleteUser(temp);
 
             printf("[%s] INFO: Client %llu successfully removed from the mailing list\n",
                    getCurrentTime(), temp->client);
@@ -141,10 +147,13 @@ void *clientHandler(void *param) {
             pthread_mutex_lock(&mutex);
             printf("[%s] ERROR: Client %llu did not receive a message about disconnected client %llu\n",
                    getCurrentTime(), temp->client, clientSocket);
-            if (!strcmp(temp->login, clientList->login))
+            if (!strcmp(temp->login, clientList->login) && (temp->prev)) {
                 clientList = clientList->prev;
-            temp = temp->prev;
-            deleteUser(temp->next);
+                temp = temp->prev;
+                deleteUser(temp->next);
+            }
+            else
+                deleteUser(temp);
             printf("[%s] INFO: Client %llu successfully removed from the mailing list\n",
                    getCurrentTime(), temp->client);
             pthread_mutex_unlock(&mutex);
@@ -154,9 +163,12 @@ void *clientHandler(void *param) {
     }
 
     pthread_mutex_lock(&mutex);
-    if(!strcmp(currentClient->login, clientList->login))
+    if(!strcmp(currentClient->login, clientList->login) && currentClient->prev) {
         clientList = clientList->prev;
-    deleteUser(currentClient);
+        deleteUser(currentClient);
+    }
+    else
+        deleteUser(currentClient);
     printf("[%s] INFO: Client %llu disconnected from server\n",
            getCurrentTime(), clientSocket);
     pthread_mutex_unlock(&mutex);
