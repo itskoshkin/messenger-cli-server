@@ -6,11 +6,31 @@
 
 #IncludeRegexTransform: 
 
-C:/Users/Stanislav/CLionProjects/server/source/Init.c
-Services/ServerService.h
+C:/Users/Stanislav/CLionProjects/server/source/Services/AuthService.h
+stdbool.h
+-
+stdio.h
+-
+
+C:/Users/Stanislav/CLionProjects/server/source/Services/ClientStruct.h
+stdbool.h
+-
+winsock2.h
+-
+malloc.h
+-
+string.h
+-
+
+C:/Users/Stanislav/CLionProjects/server/source/Services/ServerService.c
+ServerService.h
 C:/Users/Stanislav/CLionProjects/server/source/Services/ServerService.h
-Services/TimeService.h
+TimeService.h
 C:/Users/Stanislav/CLionProjects/server/source/Services/TimeService.h
+AuthService.h
+C:/Users/Stanislav/CLionProjects/server/source/Services/AuthService.h
+ClientStruct.h
+C:/Users/Stanislav/CLionProjects/server/source/Services/ClientStruct.h
 
 C:/Users/Stanislav/CLionProjects/server/source/Services/ServerService.h
 pthread.h

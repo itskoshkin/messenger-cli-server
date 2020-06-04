@@ -72,7 +72,7 @@ void *clientHandler(void *param) {
 
         if (ret == SOCKET_ERROR) {
             pthread_mutex_lock(&mutex);
-            fprintf(stderr, , "[%s] ERROR: Client %llu error sending authorization success report\n",
+            fprintf(stderr, "[%s] ERROR: Client %llu error sending authorization success report\n",
                     getCurrentTime(), (SOCKET) param);
             if (!strcmp(currentClient->login, clientList->login) && currentClient->prev) {
                 clientList = clientList->prev;
