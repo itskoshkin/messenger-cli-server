@@ -4,7 +4,7 @@
 
 Server app using winsock2.h programming - it is a class project for 19SE (software engineering) at Higher School of Economics University.
 
-The application is multithreaded: it supports user handling, registration and login, user login and logout alert, sending messages to the user pool.
+The application is multithreaded: it supports user handling, registration and login, user login and logout alert, sending messages to the user pool. [Link to the client app](https://github.com/ssstoyanov/client).
 
 ### Collaborators
 
