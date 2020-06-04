@@ -126,11 +126,15 @@ void *clientHandler(void *param) {
         tempdown = clientList->prev;
         while (tempdown) {
             send(tempdown->client, receive, 1024, 0);
+            printf("[%s] INFO: Client %llu received a message %s from client %llu\n",
+                    getCurrentTime(), clientSocket, receive, tempdown->client);
             tempdown = tempdown->prev;
         }
         tempup = clientList->next;
         while (tempup) {
             send(tempup->client, receive, 1024, 0);
+            printf("[%s] INFO: Client %llu received a message %s from client %llu\n",
+                    getCurrentTime(), clientSocket, receive, tempup->client);
             tempup = tempup->next;
         }
         send(clientList->client, receive, 1024, 0);

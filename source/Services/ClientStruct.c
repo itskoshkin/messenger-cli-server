@@ -4,10 +4,6 @@
 
 #include "ClientStruct.h"
 
-struct Client *init(SOCKET newUser, char *login) {
-
-}
-
 struct Client *addUser(struct Client *lastUser, SOCKET newUser, char *login) {
     if (lastUser) {
         struct Client *nextUser = (struct Client *) malloc(sizeof(struct Client));
