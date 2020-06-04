@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Users/Stanislav/CLionProjects/server/source/Init.c
+Services/ServerService.h
+C:/Users/Stanislav/CLionProjects/server/source/Services/ServerService.h
+Services/TimeService.h
+C:/Users/Stanislav/CLionProjects/server/source/Services/TimeService.h
+
+C:/Users/Stanislav/CLionProjects/server/source/Services/ServerService.h
+pthread.h
+-
+winsock2.h
+-
+stdio.h
+-
+
+C:/Users/Stanislav/CLionProjects/server/source/Services/TimeService.h
+

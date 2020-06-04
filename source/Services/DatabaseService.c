@@ -27,7 +27,7 @@ char *makeData(char *login, char *password) {
 
 bool openData(FILE *database) {
     if (!database) {
-       printf("[%s] ERROR: Error open database\n", getCurrentTime());
+       fprintf(stderr, "[%s] ERROR: Error open database\n", getCurrentTime());
         return false;
     }
     return true;
