@@ -124,20 +124,20 @@ void *clientHandler(void *param) {
         tempdown = clientList->prev;
         while (tempdown) {
             send(tempdown->client, receive, 1024, 0);
-            printf("[%s] INFO: Client %llu send a message %s to client %llu\n",
-                   getCurrentTime(), clientSocket, receive, tempdown->client);
+            printf("[%s] INFO: Client %llu send a message to client %llu\n",
+                   getCurrentTime(), clientSocket, tempdown->client);
             tempdown = tempdown->prev;
         }
         tempup = clientList->next;
         while (tempup) {
             send(tempup->client, receive, 1024, 0);
-            printf("[%s] INFO: Client %llu send a message %s to client %llu\n",
-                   getCurrentTime(), clientSocket, receive, tempup->client);
+            printf("[%s] INFO: Client %llu send a message to client %llu\n",
+                   getCurrentTime(), clientSocket, tempup->client);
             tempup = tempup->next;
         }
         send(clientList->client, receive, 1024, 0);
-        printf("[%s] INFO: Client %llu send a message %s to client %llu\n",
-               getCurrentTime(), clientSocket, receive, clientSocket);
+        printf("[%s] INFO: Client %llu send a message to client %llu\n",
+               getCurrentTime(), clientSocket, clientSocket);
         pthread_mutex_unlock(&mutex);
         bzero(receive, sizeof(receive));
     }
