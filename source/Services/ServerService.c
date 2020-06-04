@@ -35,6 +35,7 @@ void *clientHandler(void *param) {
         if (!ret || ret == SOCKET_ERROR) {
             pthread_mutex_lock(&mutex);
             printf("[%s] ERROR: Client %llu error getting auth data\n", getCurrentTime(), clientSocket);
+            printf("[%s] ERROR: Client %llu will be disconnected from server\n", getCurrentTime(), clientSocket);
             pthread_mutex_unlock(&mutex);
             return (void *) 1;
         }
@@ -80,6 +81,8 @@ void *clientHandler(void *param) {
             }
             printf("[%s] INFO: Client %llu successfully removed from the mailing list\n",
                    getCurrentTime(), (SOCKET) param);
+            printf("[%s] ERROR: Client %llu will be disconnected from server\n",
+                   getCurrentTime(), clientSocket);
             pthread_mutex_unlock(&mutex);
             return (void *) 2;
         }
@@ -102,6 +105,8 @@ void *clientHandler(void *param) {
                 deleteUser(temp);
             }
             printf("[%s] INFO: Client %llu successfully removed from the mailing list\n",
+                   getCurrentTime(), temp->client);
+            printf("[%s] ERROR: Client %llu will be disconnected from server\n",
                    getCurrentTime(), temp->client);
             pthread_mutex_unlock(&mutex);
             continue;
@@ -153,6 +158,8 @@ void *clientHandler(void *param) {
                 deleteUser(temp);
             printf("[%s] INFO: Client %llu successfully removed from the mailing list\n",
                    getCurrentTime(), temp->client);
+            printf("[%s] ERROR: Client %llu will be disconnected from server\n",
+                   getCurrentTime(), temp->client);
             pthread_mutex_unlock(&mutex);
             continue;
         }
@@ -184,7 +191,7 @@ _Noreturn void clientAcceptor(SOCKET server) {
         printf("[%s] INFO: Client %llu was accepted\n", getCurrentTime(), client);
 
         if (client == SOCKET_ERROR) {
-            printf("[%s] WARN: Client %llu error accept Client\n", getCurrentTime(), client);
+            printf("[%s] WARN: Client %llu - error accept the client\n", getCurrentTime(), client);
             continue;
         }
 
