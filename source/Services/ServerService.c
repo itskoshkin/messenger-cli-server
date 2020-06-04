@@ -111,10 +111,24 @@ void *clientHandler(void *param) {
         temp = temp->prev;
     }
 
+    Client *tempup;
+    Client *tempdown;
     while (1) {
         ret = recv(clientSocket, receive, 1024, 0);
         if (ret == SOCKET_ERROR) goto exit;
-        while (clientList->prev) send(clientList->client, receive, 1024, 0);
+        pthread_mutex_lock(&mutex);
+        tempdown = clientList->prev;
+        while (tempdown) {
+            send(tempdown->client, receive, 1024, 0);
+            tempdown = tempdown->prev;
+        }
+        tempup = clientList->next;
+        while (tempup) {
+            send(tempup->client, receive, 1024, 0);
+            tempup = tempup->next;
+        }
+        send(clientList->client, receive, 1024, 0);
+        pthread_mutex_unlock(&mutex);
         bzero(receive, sizeof(receive));
     }
 
