@@ -155,8 +155,9 @@ void *clientHandler(void *param) {
                 clientList = clientList->prev;
                 temp = temp->prev;
                 deleteUser(temp->next);
-            } else
+            } else {
                 deleteUser(temp);
+            }
             printf("[%s] INFO: Client %llu successfully removed from the mailing list\n",
                    getCurrentTime(), temp->client);
             fprintf(stderr, "[%s] ERROR: Client %llu will be disconnected from server\n",
