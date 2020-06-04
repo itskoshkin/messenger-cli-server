@@ -6,6 +6,7 @@
 #include "TimeService.h"
 #include "AuthService.h"
 #include "ClientStruct.h"
+#define bzero(b, len) (memset((b), '\0', (len)), (void) 0)
 
 #define PORT 8080
 #define MAXCONN 50
@@ -26,10 +27,6 @@ void *clientHandler(void *param) {
     int isOk, ret;
     Client* currentClient;
     SOCKET clientSocket = (SOCKET) param;
-
-    /**
-     * AUTH
-     */
 
     do {
         ret = recv(clientSocket, receive, 1024, 0);
@@ -93,8 +90,7 @@ void *clientHandler(void *param) {
 
     } while (!isOk);
 
-    //FIXME TODO @SergeyBoryaev уведомление о коннекте
-    sprintf(transmit, "%s is online!", currentClient->login);
+    sprintf(transmit, "%s is online!\n", currentClient->login);
     temp = clientList;
     while (temp) {
         ret = send(temp->client, transmit, 1024, 0);
@@ -115,40 +111,26 @@ void *clientHandler(void *param) {
         temp = temp->prev;
     }
 
-    /**
-     * FIXME Опрашивает текущее соединение и уведомляет всех остальных
-     */
-
     while (1) {
-        //опросить текущее соединение
         ret = recv(clientSocket, receive, 1024, 0);
-
-        //ошибка? удаление из списка активных соединений,
-        if (ret == SOCKET_ERROR) {
-            goto exit;
-        }
-
-
-        while (clientList->prev) {
-            send(clientList->client, receive, 1024, 0);
-        }
+        if (ret == SOCKET_ERROR) goto exit;
+        while (clientList->prev) send(clientList->client, receive, 1024, 0);
+        bzero(receive, sizeof(receive));
     }
 
     exit:
-    //FIXME TODO @SergeyBoryaev уведомление о выходе
-    sprintf(transmit, "%s leaving", login);
+    sprintf(transmit, "%s leaving\n", login);
     temp = clientList;
     while (temp) {
         ret = send(temp->client, transmit, 1024, 0);
         if (ret == SOCKET_ERROR) {
             pthread_mutex_lock(&mutex);
-            printf("[%s] ERROR: Client %llu did not receive a message about disconnected user\n",
-                   getCurrentTime(), temp->client);
+            printf("[%s] ERROR: Client %llu did not receive a message about disconnected client %llu\n",
+                   getCurrentTime(), temp->client, clientSocket);
             if (!strcmp(temp->login, clientList->login))
                 clientList = clientList->prev;
             temp = temp->prev;
             deleteUser(temp->next);
-
             printf("[%s] INFO: Client %llu successfully removed from the mailing list\n",
                    getCurrentTime(), temp->client);
             pthread_mutex_unlock(&mutex);
@@ -162,7 +144,7 @@ void *clientHandler(void *param) {
         clientList = clientList->prev;
     deleteUser(currentClient);
     printf("[%s] INFO: Client %llu disconnected from server\n",
-           getCurrentTime(), (SOCKET) param);
+           getCurrentTime(), clientSocket);
     pthread_mutex_unlock(&mutex);
 
     return (void *) 0;
