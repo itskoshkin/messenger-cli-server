@@ -31,9 +31,14 @@ struct Client *addUser(struct Client *lastUser, SOCKET newUser, char *login) {
 }
 
 void deleteUser(struct Client *targetUser) {
-    targetUser->prev->next = targetUser->next;
-    targetUser->next->prev = targetUser->prev;
-    free(targetUser->login);
+    struct Client *prev, *next;
+    prev = targetUser->prev;
+    next = targetUser->next;
+    if (prev != NULL)
+        targetUser->prev->next = targetUser->next;
+    if (next != NULL)
+        targetUser->next->prev = targetUser->prev;
+   // free(targetUser->login);
     free(targetUser);
 }
 
