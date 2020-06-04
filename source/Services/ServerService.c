@@ -1,5 +1,5 @@
 /**
- * @authors Stanislav Stoianov, Sergey Boryaev
+ * @authors Stanislav Stoianov, Sergey Boryaev, Darya Pavlova
  */
 
 #include "ServerService.h"
@@ -96,7 +96,8 @@ void *clientHandler(void *param) {
         }
 
     } while (!isOk);
-    //уведомление о коннкекте
+
+    //FIXME TODO @SergeyBoryaev уведомление о коннекте
     sprintf(transmit, "%s is online!", currentClient->login);
     temp = clientList;
     while (temp->prev) {
@@ -105,7 +106,7 @@ void *clientHandler(void *param) {
             pthread_mutex_lock(&mutex);
             printf("[%s] ERROR: Client %llu did not receive a message about new user\n",
                    getCurrentTime(), (SOCKET) param);
-            if(!strcmp(currentClient->login, clientList->login))
+            if (!strcmp(currentClient->login, clientList->login))
                 clientList = clientList->prev;
             deleteUser(currentClient);
 
@@ -145,7 +146,7 @@ void *clientHandler(void *param) {
         }
     }
 
-    //уведомление о выходе
+    //FIXME TODO @SergeyBoryaev уведомление о выходе
     sprintf(transmit, "%s leaving", login);
     temp = clientList;
     while (temp->prev) {

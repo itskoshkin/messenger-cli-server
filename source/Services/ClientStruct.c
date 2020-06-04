@@ -1,12 +1,13 @@
 /**
- * @authors Sergey Boryaev
+ * @authors Sergey Boryaev, Darya Pavlova
  */
 
-
 #include "ClientStruct.h"
-struct Client *init(SOCKET newUser, char *login){
+
+struct Client *init(SOCKET newUser, char *login) {
 
 }
+
 struct Client *addUser(struct Client *lastUser, SOCKET newUser, char *login) {
     if (lastUser) {
         struct Client *nextUser = (struct Client *) malloc(sizeof(struct Client));
@@ -17,8 +18,7 @@ struct Client *addUser(struct Client *lastUser, SOCKET newUser, char *login) {
         nextUser->login = login;
         lastUser->next = nextUser;
         return nextUser;
-    }
-    else {
+    } else {
         lastUser = (struct Client *) malloc(sizeof(struct Client));
         lastUser->prev = NULL;
         lastUser->next = NULL;
@@ -38,7 +38,7 @@ void deleteUser(struct Client *targetUser) {
         targetUser->prev->next = targetUser->next;
     if (next != NULL)
         targetUser->next->prev = targetUser->prev;
-   // free(targetUser->login);
+    // free(targetUser->login);
     free(targetUser);
 }
 
