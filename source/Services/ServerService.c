@@ -6,6 +6,7 @@
 #include "TimeService.h"
 #include "AuthService.h"
 #include "ClientStruct.h"
+
 #define bzero(b, len) (memset((b), '\0', (len)), (void) 0)
 
 #define PORT 8080
@@ -13,7 +14,7 @@
 
 pthread_mutex_t mutex;
 
-Client* clientList;
+Client *clientList;
 
 void *clientHandler(void *param) {
     Client *temp;
@@ -25,7 +26,7 @@ void *clientHandler(void *param) {
 
     char receive[1024], transmit[1024], login[64];
     int isOk, ret;
-    Client* currentClient;
+    Client *currentClient;
     SOCKET clientSocket = (SOCKET) param;
 
     do {
@@ -35,15 +36,10 @@ void *clientHandler(void *param) {
             pthread_mutex_lock(&mutex);
             printf("[%s] ERROR: Client %llu error getting auth data\n", getCurrentTime(), clientSocket);
             pthread_mutex_unlock(&mutex);
-
-            pthread_mutex_lock(&mutex);
-            pthread_mutex_unlock(&mutex);
-
             return (void *) 1;
         }
 
         receive[ret] = '\0';
-
         pthread_mutex_lock(&mutex);
         printf("[%s] INFO: Client %llu was receive an auth request: %s\n", getCurrentTime(), clientSocket, receive);
         pthread_mutex_unlock(&mutex);
@@ -61,14 +57,14 @@ void *clientHandler(void *param) {
             sprintf(transmit, "%d%c", isOk, '\0');
             ret = send(clientSocket, transmit, 1024, 0);
             pthread_mutex_lock(&mutex);
-            printf("[%s] INFO: Client %llu login successful\n", getCurrentTime(), (SOCKET) param);
+            printf("[%s] INFO: Client %llu is login successful\n", getCurrentTime(), (SOCKET) param);
             currentClient = addUser(clientList, clientSocket, login);
             clientList = currentClient;
             printf("[%s] INFO: Client %llu successfully added to the mailing list\n", getCurrentTime(), (SOCKET) param);
             pthread_mutex_unlock(&mutex);
-
         } else {
             sprintf(transmit, "%d%c", isOk, '\0');
+            printf("[%s] INFO: Client %llu is not login successful\n", getCurrentTime(), (SOCKET) param);
             ret = send(clientSocket, transmit, 1024, 0);
         }
 
@@ -76,18 +72,15 @@ void *clientHandler(void *param) {
             pthread_mutex_lock(&mutex);
             printf("[%s] ERROR: Client %llu error sending authorization success report\n",
                    getCurrentTime(), (SOCKET) param);
-
-            if(!strcmp(currentClient->login, clientList->login) && currentClient->prev) {
+            if (!strcmp(currentClient->login, clientList->login) && currentClient->prev) {
                 clientList = clientList->prev;
                 deleteUser(currentClient);
-            }
-            else
+            } else {
                 deleteUser(currentClient);
-
+            }
             printf("[%s] INFO: Client %llu successfully removed from the mailing list\n",
                    getCurrentTime(), (SOCKET) param);
             pthread_mutex_unlock(&mutex);
-
             return (void *) 2;
         }
 
@@ -105,10 +98,9 @@ void *clientHandler(void *param) {
                 clientList = clientList->prev;
                 temp = temp->prev;
                 deleteUser(temp->next);
-            }
-            else
+            } else {
                 deleteUser(temp);
-
+            }
             printf("[%s] INFO: Client %llu successfully removed from the mailing list\n",
                    getCurrentTime(), temp->client);
             pthread_mutex_unlock(&mutex);
@@ -126,18 +118,20 @@ void *clientHandler(void *param) {
         tempdown = clientList->prev;
         while (tempdown) {
             send(tempdown->client, receive, 1024, 0);
-            printf("[%s] INFO: Client %llu received a message %s from client %llu\n",
-                    getCurrentTime(), clientSocket, receive, tempdown->client);
+            printf("[%s] INFO: Client %llu send a message %s to client %llu\n",
+                   getCurrentTime(), clientSocket, receive, tempdown->client);
             tempdown = tempdown->prev;
         }
         tempup = clientList->next;
         while (tempup) {
             send(tempup->client, receive, 1024, 0);
-            printf("[%s] INFO: Client %llu received a message %s from client %llu\n",
-                    getCurrentTime(), clientSocket, receive, tempup->client);
+            printf("[%s] INFO: Client %llu send a message %s to client %llu\n",
+                   getCurrentTime(), clientSocket, receive, tempup->client);
             tempup = tempup->next;
         }
         send(clientList->client, receive, 1024, 0);
+        printf("[%s] INFO: Client %llu send a message %s to client %llu\n",
+               getCurrentTime(), clientSocket, receive, clientSocket);
         pthread_mutex_unlock(&mutex);
         bzero(receive, sizeof(receive));
     }
@@ -155,8 +149,7 @@ void *clientHandler(void *param) {
                 clientList = clientList->prev;
                 temp = temp->prev;
                 deleteUser(temp->next);
-            }
-            else
+            } else
                 deleteUser(temp);
             printf("[%s] INFO: Client %llu successfully removed from the mailing list\n",
                    getCurrentTime(), temp->client);
@@ -167,12 +160,12 @@ void *clientHandler(void *param) {
     }
 
     pthread_mutex_lock(&mutex);
-    if(!strcmp(currentClient->login, clientList->login) && currentClient->prev) {
+    if (!strcmp(currentClient->login, clientList->login) && currentClient->prev) {
         clientList = clientList->prev;
         deleteUser(currentClient);
-    }
-    else
+    } else {
         deleteUser(currentClient);
+    }
     printf("[%s] INFO: Client %llu disconnected from server\n",
            getCurrentTime(), clientSocket);
     pthread_mutex_unlock(&mutex);
