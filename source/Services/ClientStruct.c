@@ -39,7 +39,7 @@ void deleteUser(struct Client *targetUser) {
 
 struct Client *findByLogin(char *login, struct Client *lastUser) {
     struct Client *temp = lastUser;
-    while (lastUser) {
+    while (temp) {
         if (!strcmp(login, temp->login))
             return temp;
         temp = temp->prev;
