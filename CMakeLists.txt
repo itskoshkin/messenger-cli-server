@@ -11,5 +11,7 @@ set(source_files
         )
 
 # build
+SET(CMAKE_CXX_FLAGS -pthread)
 add_executable(server source/Init.c source/Services/ServerService.c source/Services/ServerService.h source/Services/TimeService.c source/Services/TimeService.h source/Services/DatabaseService.c source/Services/DatabaseService.h source/Services/AuthService.c source/Services/AuthService.h source/Services/ClientStruct.h source/Services/ClientStruct.c)
 target_link_libraries(server ws2_32)
+target_link_libraries(${PROJECT_NAME} pthread)
