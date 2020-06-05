@@ -6,6 +6,7 @@
 #include "TimeService.h"
 #include "AuthService.h"
 #include "ClientStruct.h"
+#include "DatabaseService.h"
 
 #define bzero(b, len) (memset((b), '\0', (len)), (void) 0)
 
@@ -152,6 +153,7 @@ void *clientHandler(void *param) {
         printf("[%s] INFO: Client %llu send a message to client %llu\n",
                getCurrentTime(), clientSocket, clientSocket);
         pthread_mutex_unlock(&mutex);
+        recordMessage(receive);
         bzero(receive, sizeof(receive));
     }
 
@@ -185,6 +187,7 @@ void *clientHandler(void *param) {
             pthread_mutex_unlock(&mutex);
             if(tempsock == clientSocket)
                 isOk = 1;
+
             continue;
         }
         temp = temp->prev;
@@ -215,6 +218,8 @@ _Noreturn void clientAcceptor(SOCKET server) {
     int size;
     struct sockaddr_in sockaddrIn;
     SOCKET client;
+
+    initMessageDB();
 
     while (1) {
         size = sizeof(sockaddrIn);

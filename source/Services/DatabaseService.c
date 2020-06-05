@@ -107,6 +107,14 @@ bool signUp(char *login, char *password) {
     return true;
 }
 
+void initMessageDB(){
+    //открыть файл с базой данных
+}
+
+void recordMessage(char * message){
+    //записать в бд
+}
+
 //TEST function
 /*
 int main() {
