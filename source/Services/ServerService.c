@@ -17,6 +17,8 @@ pthread_mutex_t mutex;
 
 Client *clientList;
 
+void record(char *receive);
+
 void *clientHandler(void *param) {
     Client *temp;
     pthread_mutex_lock(&mutex);
@@ -152,8 +154,8 @@ void *clientHandler(void *param) {
         send(clientList->client, receive, 1024, 0);
         printf("[%s] INFO: Client %llu send a message to client %llu\n",
                getCurrentTime(), clientSocket, clientSocket);
+        record(receive);
         pthread_mutex_unlock(&mutex);
-        recordMessage(receive);
         bzero(receive, sizeof(receive));
     }
 
@@ -214,13 +216,12 @@ void *clientHandler(void *param) {
     return (void *) 0;
 }
 
+
+
 _Noreturn void clientAcceptor(SOCKET server) {
     int size;
     struct sockaddr_in sockaddrIn;
     SOCKET client;
-
-    initMessageDB();
-
     while (1) {
         size = sizeof(sockaddrIn);
         client = accept(server, (struct sockaddr *) &sockaddrIn, &size);

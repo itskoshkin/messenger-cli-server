@@ -107,11 +107,11 @@ bool signUp(char *login, char *password) {
     return true;
 }
 
-void recordMessage(char * message){
-    FILE *database = fopen("../data/users.txt", "a");
+void record(char *receive){
+    FILE *database = fopen("../data/messages.txt", "a");
     openData(database);
 
-    fprintf(database, "%s", message);
+    fprintf(database, "%s", receive);
     fclose(database);
 }
 

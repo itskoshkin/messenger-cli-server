@@ -22,6 +22,12 @@ malloc.h
 string.h
 -
 
+C:/Users/Stanislav/CLionProjects/server/source/Services/DatabaseService.h
+stdbool.h
+-
+stdio.h
+-
+
 C:/Users/Stanislav/CLionProjects/server/source/Services/ServerService.c
 ServerService.h
 C:/Users/Stanislav/CLionProjects/server/source/Services/ServerService.h
@@ -31,6 +37,8 @@ AuthService.h
 C:/Users/Stanislav/CLionProjects/server/source/Services/AuthService.h
 ClientStruct.h
 C:/Users/Stanislav/CLionProjects/server/source/Services/ClientStruct.h
+DatabaseService.h
+C:/Users/Stanislav/CLionProjects/server/source/Services/DatabaseService.h
 
 C:/Users/Stanislav/CLionProjects/server/source/Services/ServerService.h
 pthread.h

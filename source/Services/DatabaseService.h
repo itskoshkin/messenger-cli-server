@@ -11,7 +11,7 @@ bool signIn(char *login, char *password);
 
 bool signUp(char *login, char *password);
 
-void recordMessage(char * message);
+void record(char *receive);
 
 #define SERVER_AUTHSERVICE_H
 

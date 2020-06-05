@@ -4,4 +4,5 @@ STASS:PASSWORD
 SERYOZHENKA:TUTPAROL
 somsom:som
 test:test
-PUSSY:pussy
+Elena:password
+

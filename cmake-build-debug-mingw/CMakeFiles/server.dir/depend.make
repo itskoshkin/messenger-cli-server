@@ -18,6 +18,7 @@ CMakeFiles/server.dir/source/Services/DatabaseService.c.obj: ../source/Services/
 
 CMakeFiles/server.dir/source/Services/ServerService.c.obj: ../source/Services/AuthService.h
 CMakeFiles/server.dir/source/Services/ServerService.c.obj: ../source/Services/ClientStruct.h
+CMakeFiles/server.dir/source/Services/ServerService.c.obj: ../source/Services/DatabaseService.h
 CMakeFiles/server.dir/source/Services/ServerService.c.obj: ../source/Services/ServerService.c
 CMakeFiles/server.dir/source/Services/ServerService.c.obj: ../source/Services/ServerService.h
 CMakeFiles/server.dir/source/Services/ServerService.c.obj: ../source/Services/TimeService.h

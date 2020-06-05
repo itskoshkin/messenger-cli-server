@@ -19,6 +19,7 @@ CMakeFiles/server.dir/source/Services/DatabaseService.c.obj
 CMakeFiles/server.dir/source/Services/ServerService.c.obj
  C:/Users/Stanislav/CLionProjects/server/source/Services/AuthService.h
  C:/Users/Stanislav/CLionProjects/server/source/Services/ClientStruct.h
+ C:/Users/Stanislav/CLionProjects/server/source/Services/DatabaseService.h
  C:/Users/Stanislav/CLionProjects/server/source/Services/ServerService.c
  C:/Users/Stanislav/CLionProjects/server/source/Services/ServerService.h
  C:/Users/Stanislav/CLionProjects/server/source/Services/TimeService.h
