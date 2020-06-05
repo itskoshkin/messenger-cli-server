@@ -90,6 +90,8 @@ void *clientHandler(void *param) {
 
     } while (!isOk);
 
+    isOk = 0;
+
     sprintf(transmit, "%s is online!\n", currentClient->login);
     temp = clientList;
     while (temp) {
@@ -98,22 +100,33 @@ void *clientHandler(void *param) {
             pthread_mutex_lock(&mutex);
             fprintf(stderr, "[%s] ERROR: Client %llu did not receive a message about new user\n",
                     getCurrentTime(), temp->client);
+            SOCKET tempsock = temp->client;
             if (!strcmp(temp->login, clientList->login) && (temp->prev)) {
                 clientList = clientList->prev;
                 temp = temp->prev;
                 deleteUser(temp->next);
+            } else if(!strcmp(currentClient->login, clientList->login)){
+                temp = NULL;
+                clientList = NULL;
+                deleteUser(currentClient);
             } else {
-                deleteUser(temp);
+                Client* delete = temp;
+                temp = temp->prev;
+                deleteUser(delete);
             }
             printf("[%s] INFO: Client %llu successfully removed from the mailing list\n",
-                   getCurrentTime(), temp->client);
+                   getCurrentTime(), tempsock);
             fprintf(stderr, "[%s] ERROR: Client %llu will be disconnected from server\n",
-                    getCurrentTime(), temp->client);
+                    getCurrentTime(), tempsock);
             pthread_mutex_unlock(&mutex);
+            if(tempsock == clientSocket)
+                isOk = 1;
             continue;
         }
         temp = temp->prev;
     }
+    if(isOk)
+        return 0;
 
     Client *tempup;
     Client *tempdown;
@@ -151,28 +164,44 @@ void *clientHandler(void *param) {
             pthread_mutex_lock(&mutex);
             fprintf(stderr, "[%s] ERROR: Client %llu did not receive a message about disconnected client %llu\n",
                     getCurrentTime(), temp->client, clientSocket);
+            SOCKET tempsock = temp->client;
             if (!strcmp(temp->login, clientList->login) && (temp->prev)) {
                 clientList = clientList->prev;
                 temp = temp->prev;
                 deleteUser(temp->next);
+            } else if(!strcmp(currentClient->login, clientList->login)){
+                temp = NULL;
+                clientList = NULL;
+                deleteUser(currentClient);
             } else {
-                deleteUser(temp);
+                Client* delete = temp;
+                temp = temp->prev;
+                deleteUser(delete);
             }
             printf("[%s] INFO: Client %llu successfully removed from the mailing list\n",
-                   getCurrentTime(), temp->client);
+                   getCurrentTime(), tempsock);
             fprintf(stderr, "[%s] ERROR: Client %llu will be disconnected from server\n",
-                    getCurrentTime(), temp->client);
+                    getCurrentTime(), tempsock);
             pthread_mutex_unlock(&mutex);
+            if(tempsock == clientSocket)
+                isOk = 1;
             continue;
         }
         temp = temp->prev;
     }
-
+    if(isOk)
+        return 0;
     pthread_mutex_lock(&mutex);
     if (!strcmp(currentClient->login, clientList->login) && currentClient->prev) {
         clientList = clientList->prev;
         deleteUser(currentClient);
-    } else {
+    }
+    else if(!strcmp(currentClient->login, clientList->login)){
+        temp = NULL;
+        clientList = NULL;
+        deleteUser(currentClient);
+    }
+    else {
         deleteUser(currentClient);
     }
     printf("[%s] INFO: Client %llu disconnected from server\n",
