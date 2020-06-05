@@ -107,12 +107,12 @@ bool signUp(char *login, char *password) {
     return true;
 }
 
-void initMessageDB(){
-    //открыть файл с базой данных
-}
-
 void recordMessage(char * message){
-    //записать в бд
+    FILE *database = fopen("../data/users.txt", "a");
+    openData(database);
+
+    fprintf(database, "%s", message);
+    fclose(database);
 }
 
 //TEST function
