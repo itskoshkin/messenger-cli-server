@@ -54,7 +54,8 @@ struct Client *connectNewUser(struct Client *lastUser, SOCKET newUser, char *log
     if (User) {
         User->IsOnline = true;
         User->client = newUser;
-    } else
+    } else{
         User = addUser(lastUser, newUser, login);
+    }
     return User;
 }
